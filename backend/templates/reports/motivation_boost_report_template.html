@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Motivation Boost - {{client_name}}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+            @bottom-center {
+                content: "Halaman " counter(page) " dari " counter(pages);
+                font-size: 10px;
+                color: #666;
+            }
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin: 0;
+            font-weight: bold;
+        }
+        
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .client-info {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .client-info h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            font-size: 20px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            min-width: 120px;
+            color: #34495e;
+        }
+        
+        .info-value {
+            color: #2c3e50;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            font-size: 22px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .test-overview {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 30px;
+        }
+        
+        .test-overview h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        
+        .motivation-dimensions {
+            display: block;
+            gap: 25px;
+        }
+        
+        .dimension-card {
+            background-color: #ffffff;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+            page-break-after: auto;
+            margin-bottom: 25px;
+        }
+        
+        .dimension-card:last-child {
+            page-break-after: avoid;
+        }
+        
+        .dimension-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .dimension-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-right: auto;
+        }
+        
+        .dimension-subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .dimension-content {
+            margin-top: 15px;
+        }
+        
+        .overview-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .overview-section h4 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .strength-challenge-section {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .strength-challenge-section h4 {
+            color: #856404;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .summary {
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .summary h3 {
+            color: #155724;
+            margin-top: 0;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #bdc3c7;
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        ul {
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Laporan Motivation Boost</h1>
+        <div class="subtitle">Analisis Motivasi dan Dorongan Pribadi</div>
+    </div>
+    
+    <div class="client-info">
+        <h2>Informasi Klien</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Nama:</span>
+                <span class="info-value">{{client_name}}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Tanggal Tes:</span>
+                <span class="info-value">{{test_date}}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Usia:</span>
+                <span class="info-value">{{client_age}} tahun</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Tanggal Laporan:</span>
+                <span class="info-value">{{report_date}}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Tentang Tes Motivation Boost</h2>
+        <div class="test-overview">
+            <h3>{{test_name}}</h3>
+            <p><strong>Jenis Tes:</strong> {{test_type}}</p>
+            <p><strong>Deskripsi:</strong> Tes Motivation Boost mengidentifikasi faktor-faktor motivasi utama yang mendorong kinerja dan kepuasan Anda. Tes ini menganalisis berbagai dimensi motivasi yang mempengaruhi cara Anda bekerja, berinteraksi, dan mencapai tujuan.</p>
+            <p><strong>Hasil Utama:</strong> Laporan ini menampilkan profil motivasi Anda dan memberikan wawasan tentang bagaimana meningkatkan motivasi dalam berbagai aspek kehidupan.</p>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Profil Motivasi Anda</h2>
+        <div class="motivation-dimensions">
+            {% for dimension_key, dimension_data in dimensions.items() %}
+            <div class="dimension-card">
+                <div class="dimension-header">
+                    <div class="dimension-title">{{ dimension_data.title }}</div>
+                </div>
+                <div class="dimension-subtitle">{{ dimension_data.subtitle }}</div>
+                
+                <div class="dimension-content">
+                    <div class="overview-section">
+                        <h4>📋 Gambaran Umum</h4>
+                        <p>{{ dimension_data.overview }}</p>
+                    </div>
+                    
+                    <div class="strength-challenge-section">
+                        <h4>💪 Kekuatan & Tantangan</h4>
+                        <p>{{ dimension_data.strengthAndChallenge }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="page-break"></div>
+    
+    <div class="section">
+        <h2>Ringkasan & Rekomendasi</h2>
+        <div class="summary">
+            <h3>Profil Motivasi Pribadi Anda</h3>
+            <p>Berdasarkan hasil tes, profil motivasi Anda menunjukkan karakteristik unik dalam berbagai dimensi. Pemahaman ini dapat membantu Anda:</p>
+            
+            <ul>
+                <li><strong>Meningkatkan Kinerja:</strong> Fokus pada faktor-faktor motivasi yang paling kuat untuk Anda</li>
+                <li><strong>Mengelola Energi:</strong> Memahami apa yang memberikan energi dan apa yang menguras motivasi</li>
+                <li><strong>Mengoptimalkan Lingkungan:</strong> Menciptakan kondisi yang mendukung motivasi alami Anda</li>
+                <li><strong>Mengembangkan Strategi:</strong> Merancang pendekatan yang sesuai dengan pola motivasi Anda</li>
+            </ul>
+            
+            <h4>Rekomendasi untuk Peningkatan Motivasi:</h4>
+            <ul>
+                <li>Identifikasi aktivitas dan situasi yang paling memotivasi Anda</li>
+                <li>Ciptakan sistem reward yang sesuai dengan profil motivasi Anda</li>
+                <li>Kelola faktor-faktor yang dapat menurunkan motivasi</li>
+                <li>Gunakan pemahaman ini untuk meningkatkan produktivitas dan kepuasan</li>
+                <li>Komunikasikan kebutuhan motivasi Anda kepada atasan atau rekan kerja</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Laporan ini dibuat pada {{report_date}} | Mindframe Psychology Assessment Platform</p>
+        <p>Untuk konsultasi lebih lanjut, silakan hubungi psikolog atau konselor profesional</p>
+    </div>
+</body>
+</html>

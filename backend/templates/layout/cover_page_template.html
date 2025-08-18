@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .cover-page {
+            min-height: 297mm !important;
+            height: 297mm !important;
+        }
+    </style>
+</head>
+<body>
+<div class="cover-page" style="
+    page-break-after: always;
+    position: relative;
+    width: 100%;
+    background-image: url('https://drive.google.com/uc?export=view&id=1tgc7dMkKWJy6tzLjWRlqd_RQYRAHi_OJ');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+">
+    <!-- Company Logo -->
+    <div style="
+        position: absolute;
+        top: 40px;
+        left: 40px;
+        z-index: 10;
+    ">
+        <img src="https://drive.google.com/uc?export=view&id=1-puArljSx-KgG2D_Lo4DLZAZstWh6O1f" 
+             alt="Satu Persen Logo" 
+             style="
+                 height: 60px;
+                 width: auto;
+                 max-width: 180px;
+             ">
+    </div>
+    
+    <!-- Main Title -->
+    <div style="
+        flex: 1;
+        display: flex;
+        align-items: top;
+        justify-content: center;
+        text-align: left;
+        padding: 160px 60px 0 60px;
+    ">
+        <h1 style="
+            font-size: 84px;
+            font-weight: 800;
+            color: #1a365d;
+            margin: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            line-height: 1.3;
+            letter-spacing: 0.5px;
+        ">
+            {{ product_name }}
+        </h1>
+    </div>
+    
+    <!-- Bottom Information -->
+    <div style="
+        padding: 25px 40px;
+        background: rgba(255, 255, 255, 0.95);
+        margin: 0 30px 60px 30px;
+        border-radius: 8px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-left: 4px solid #f6d55c;
+    ">
+        <p style="
+            font-size: 16px;
+            color: #2d3748;
+            margin: 0;
+            font-weight: 600;
+        ">
+            Nama: {{ user_name }}
+        </p>
+        <p style="
+            font-size: 16px;
+            color: #2d3748;
+            margin: 0;
+            font-weight: 600;
+        ">
+            {{ current_date }}
+        </p>
+    </div>
+</div>
+</body>
+</html>

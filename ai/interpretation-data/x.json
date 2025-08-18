@@ -1,0 +1,39 @@
+{
+    "dimensions": {
+      "security": {
+        "title": "Keamanan (Security)",
+        "subtitle": "Bahan Bakar kamu adalah... Stabilitas.",
+        "overview": "Kamu termotivasi oleh prediktabilitas, kejelasan, dan rasa aman jangka panjang. Kamu merasa paling nyaman dan produktif ketika mengetahui dengan jelas apa yang diharapkan dari kamu, memiliki jaminan pekerjaan, dan bekerja dalam lingkungan yang stabil dan tidak penuh gejolak.",
+        "manifestation": "Kamu adalah seorang perencana yang cermat, lebih memilih untuk mengikuti prosedur yang sudah terbukti berhasil, dan sangat menghargai benefit seperti asuransi dan dana pensiun. Kamu tidak menyukai perubahan mendadak atau ketidakpastian.",
+        "strengthAndChallenge": "Kekuatan kamu adalah kesetiaan, ketelitian, dan kemampuan untuk menjadi pilar yang stabil dalam sebuah organisasi. Kamu adalah pekerja yang konsisten dan dapat diandalkan. Potensi tantangannya, kamu mungkin terlalu menghindari risiko dan kurang cepat beradaptasi dengan perubahan industri atau teknologi baru."
+      },
+      "autonomy": {
+        "title": "Kemandirian (Autonomy)",
+        "subtitle": "Bahan Bakar kamu adalah... Kebebasan.",
+        "overview": "Kamu termotivasi oleh kebebasan untuk mengatur cara kerja dan jadwal kamu sendiri. Kamu merasa paling berenergi ketika diberi kepercayaan dan otonomi penuh untuk menyelesaikan tugas sesuai dengan metode kamu. Pengawasan yang ketat dan aturan yang kaku bisa dengan cepat menguras energi kamu.",
+        "manifestation": "Kamu mungkin lebih suka bekerja secara remote, sebagai seorang freelancer, atau dalam peran yang memberikan banyak fleksibilitas. Kamu adalah seorang inisiator yang tidak perlu disuruh-suruh untuk mulai bekerja dan sangat bertanggung jawab atas hasil kerja kamu sendiri.",
+        "strengthAndChallenge": "Kekuatan Kamu adalah disiplin diri, inisiatif, dan kemampuan untuk bekerja secara independen. Kamu sangat bisa dipercaya untuk mengelola pekerjaan kamu sendiri. Potensi tantangannya, Kamu mungkin merasa kurang nyaman dalam struktur tim yang sangat hierarkis atau saat harus terus-menerus meminta persetujuan untuk setiap langkah."
+      },
+      "influence": {
+        "title": "Pengaruh (Influence)",
+        "subtitle": "Bahan Bakar kamu adalah... Dampak.",
+        "overview": "Kamu termotivasi oleh kesempatan untuk memimpin, memberikan pengaruh, dan membuat ide-ide kamu didengar. Kamu merasa berenergi ketika bisa meyakinkan orang lain, memegang kendali atas sebuah situasi, dan melihat bahwa tindakan kamu menciptakan perubahan atau mengarahkan sebuah tim.",
+        "manifestation": "Kamu tidak ragu untuk menyuarakan pendapat, menikmati kompetisi, dan secara alami mengambil peran kepemimpinan dalam sebuah kelompok. Kamu termotivasi oleh status dan pengakuan sebagai seorang pemimpin atau ahli.",
+        "strengthAndChallenge": "Kekuatan Kamu adalah kemampuan untuk memotivasi orang lain dan membuat keputusan yang tegas. Kamu memiliki visi dan keberanian untuk mewujudkannya. Potensi tantangannya, kamu perlu memastikan dorongan ini digunakan untuk memimpin secara positif, bukan mendominasi, dan perlu berlatih untuk lebih sabar dalam mendengarkan perspektif yang berbeda."
+        },
+      "achievement": {
+        "title": "Prestasi (Achievement)",
+        "subtitle": "Bahan Bakar kamu adalah... Kesuksesan.",
+        "overview": "Kamu adalah seorang yang termotivasi oleh pencapaian. Kamu merasa paling hidup ketika berhasil menyelesaikan tantangan, menguasai sebuah keterampilan baru, atau mencapai sebuah tujuan yang telah kamu tetapkan. Proses dari 'tidak bisa' menjadi 'bisa' adalah sumber kepuasan terbesar kamu.",
+        "manifestation": "Kamu cenderung menetapkan standar yang tinggi untuk diri sendiri, menikmati umpan balik yang konstruktif, dan lebih suka bekerja pada tugas-tugas dengan tingkat kesulitan yang moderat (tidak terlalu mudah, tidak terlalu sulit). Kamu melihat hidup sebagai serangkaian target yang harus dicapai.",
+        "strengthAndChallenge": "Kekuatan kamu adalah etos kerja yang kuat dan fokus pada pengembangan diri. Kamu tidak mudah menyerah dan selalu mencari cara untuk menjadi lebih baik. Potensi tantangannya, Kamu bisa jadi terlalu fokus pada hasil akhir dan kurang menikmati proses, serta mungkin cenderung mengambil terlalu banyak pekerjaan demi mencapai lebih banyak hal."
+        },
+      "affiliation": {
+        "title": "Afiliasi (Affiliation)",
+        "subtitle": "Bahan Bakar kamu adalah... Koneksi.",
+        "overview": "Kamu sangat termotivasi oleh rasa memiliki, hubungan yang harmonis, dan diterima oleh sebuah kelompok. Kamu merasa paling berenergi saat bekerja dalam tim yang suportif, berkolaborasi, dan membangun hubungan interpersonal yang kuat. Bagi kamu, 'siapa' yang bekerja dengan kamu sama pentingnya dengan 'apa' yang kamu kerjakan.",
+        "manifestation": "Kamu cenderung menghindari konflik, lebih suka bekerja sama daripada bersaing, dan sangat menghargai pujian yang tulus dan rasa kebersamaan. Kamu adalah 'perekat sosial' yang hebat dalam sebuah tim atau lingkaran pertemanan.",
+        "strengthAndChallenge": "Kekuatan kamu adalah kemampuan untuk membangun kepercayaan dan menciptakan lingkungan yang kolaboratif dan positif. Kamu adalah anggota tim yang disukai semua orang. Potensi tantangannya, kamu mungkin kesulitan memberikan kritik yang membangun karena takut merusak hubungan, dan bisa jadi kurang produktif jika bekerja dalam isolasi."
+        }
+    }
+  }

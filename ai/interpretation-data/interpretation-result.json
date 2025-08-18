@@ -1,0 +1,94 @@
+{
+    "interpretations": [
+      {
+        "_id": "689d9d259751994f1ef61abb",
+        "createdAt": "Thu, 10 Aug 2023 10:00:00 GMT",
+        "isActive": true,
+        "results": {
+          "dimensions": {
+            "achievement": {
+              "description": "Bagi Kamu, motivasi utama adalah kesuksesan dan pengakuan. Kamu ingin menunjukkan kompetensi Kamu dan diakui sebagai orang yang mampu dan berhasil sesuai dengan standar sosial. Ambisi adalah nama tengah Kamu.",
+              "manifestation": "Kamu adalah orang yang berorientasi pada tujuan (goal-oriented), kompetitif (dengan cara yang sehat), dan selalu berusaha memberikan yang terbaik. Kamu mendapatkan kepuasan besar dari pencapaian target dan menerima pujian atas kerja keras Kamu.",
+              "strengthChallenges": "Kekuatan Kamu adalah ambisi, etos kerja yang kuat, dan fokus pada hasil. Kamu adalah seorang high-achiever yang bisa diandalkan. Potensi tantangannya, Kamu mungkin berisiko menjadi seorang workaholic dan bisa jadi terlalu keras pada diri sendiri (dan orang lain) jika standar tidak tercapai.",
+              "title": "Prestasi (Achievement)"
+            },
+            "benevolence": {},
+            "conformity": {},
+            "hedonism": {},
+            "power": {},
+            "security": {},
+            "selfDirection": {},
+            "stimulation": {},
+            "tradition": {},
+            "universalism": {}
+          },
+          "topN": 3
+        },
+        "testName": "personalValues",
+        "testType": "top-n-dimension",
+        "updatedAt": "Thu, 10 Aug 2023 10:00:00 GMT"
+      },
+      {
+        "_id": "689d9d4e9751994f1ef61abc",
+        "createdAt": "2023-08-10T10:00:00.000Z",
+        "isActive": true,
+        "results": {
+          "dimensions": {
+            "agreeableness": {
+              "rendah": {
+                "aspekKehidupan": {
+                  "gayaBelajar": [
+                    "Lebih suka belajar sendiri, di suasana yang tenang. Diskusi kelompok bukan favorit kamu, tapi refleksi pribadi jadi kekuatanmu."
+                  ],
+                  "hubunganInterpersonal": [
+                    "Biasanya kamu punya sedikit hubungan yang benar-benar dekat. Kamu cenderung menjaga jarak dan menghindari hubungan yang terlalu intens."
+                  ],
+                  "karir": [
+                    "Kamu cocok di pekerjaan yang butuh analisis rasional, independensi, dan nggak terlalu banyak interaksi emosional."
+                  ],
+                  "kekuatan": [
+                    "Kamu mandiri dan objektif. Bisa berpikir kritis dan membuat keputusan logis tanpa terlalu terpengaruh emosi atau tekanan orang lain."
+                  ],
+                  "kelemahan": [
+                    "Kamu mungkin terlihat kurang peduli atau empati, yang bisa bikin orang salah paham atau terjadi konflik kecil."
+                  ],
+                  "kepemimpinan": [
+                    "Tegas dan fokus pada hasil. Tapi, kamu mungkin perlu belajar lebih empati dan membangun koneksi emosional dengan tim."
+                  ]
+                },
+                "interpretation": "Kamu memiliki Agreeableness yang cenderung rendah, ini menunjukkan kalau kamu lebih mandiri dan terbiasa mengandalkan pendirian sendiri. Daripada menyesuaikan diri demi menjaga harmoni, kamu lebih memilih untuk bersikap jujur dan langsung. Gaya komunikasi seperti ini sering membuatmu terlihat tegas, bahkan saat berbeda pendapat.",
+                "overview": "",
+                "rekomendasi": [
+                  {
+                    "description": "Latih empati dengan lebih sering mendengarkan secara aktif dan mencoba memahami emosi orang lain tanpa menghakimi.",
+                    "title": "Empati & Perspektif"
+                  },
+                  {
+                    "description": "Cobalah terlibat dalam kerja tim kecil untuk mengembangkan kemampuanmu dalam berkompromi dan berkomunikasi terbuka.",
+                    "title": "Kolaborasi & Kerja Tim"
+                  },
+                  {
+                    "description": "Pertimbangkan menyalurkan kekuatan objektif dan analitismu dalam peran berbasis data, kebijakan, atau evaluasi sistem.",
+                    "title": "Peran Sosial & Relasional"
+                  }
+                ]
+              },
+              "sedang": {},
+              "tinggi": {}
+            },
+            "conscientiousness": {},
+            "extraversion": {},
+            "neuroticism": {},
+            "openness": {}
+          },
+          "overview": ""
+        },
+        "testName": "kepribadian",
+        "testType": "multiple-dimension",
+        "updatedAt": "2024-08-10T10:00:00.000Z"
+      }
+    ],
+    "success": true,
+    "total": 2
+  }
+  

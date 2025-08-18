@@ -1,0 +1,133 @@
+{
+  "_id": {
+    "$oid": "688a41c682760799c056b7fa"
+  },
+  "createdDate": "2025-07-30T16:01:10.316Z",
+  "orderNumber": "2025730144807",
+  "code": "jmCGjMOStFLa9nPz",
+  "status": "ACCESS_GRANTED",
+  "name": "Jhon Doe",
+  "email": "example@mail.com",
+  "phoneNumber": "628112345678",
+  "productName": "Tes Minat Bakat - Umum",
+  "package": "Standard Bundle",
+  "testResult": {
+    "kepribadian": {
+      "formId": "3jxWyE",
+      "formName": "Tes Kepribadian",
+      "score": {
+        "open": 29,
+        "conscientious": 36,
+        "extraversion": 29,
+        "agreeable": 37,
+        "neurotic": 34
+      },
+      "rank": {
+        "open": "sedang",
+        "conscientious": "sedang",
+        "extraversion": "sedang",
+        "agreeable": "tinggi",
+        "neurotic": "sedang"
+      }
+    },
+    "personalValues": {
+      "formName": "Tes Tujuan Hidup dan Personal Value",
+      "formId": "npVJq1",
+      "result": {
+        "value": "universalism",
+        "score": {
+          "universalism": 13,
+          "security": 17,
+          "benevolence": 20,
+          "hedonism": 16,
+          "achievement": 28,
+          "power": 28,
+          "self_direction": 13,
+          "Stimulation": 15,
+          "tradition": 26,
+          "conformity": 21
+        }
+      }
+    },
+    "motivationBoost": {
+      "formName": "Tes Motivasi Pendorong",
+      "formId": "3l8bvp",
+      "score": {
+        "achievement": 15,
+        "influence": 11,
+        "affiliation": 15,
+        "autonomy": 10,
+        "security": 14
+      }
+    },
+    "minatBakat": {
+      "formId": "n0Pkp0",
+      "formName": "Tes Minat Karier Umum",
+      "score": {
+        "realistic": 21,
+        "investigative": 18,
+        "artistic": 22,
+        "social": 18,
+        "enterprising": 19,
+        "conventional": 21
+      }
+    },
+    "petaPerilaku": {
+      "formName": "Tes Peta Perilaku",
+      "formId": "3N2q5Q",
+      "result": "steadiness"
+    },
+    "workingStyle": {
+      "formName": "Tes Gaya Bekerja Profesional",
+      "formId": "3l86lX",
+      "result": "analyst",
+      "scoring": {
+        "collaborator": 3,
+        "initiator": 4,
+        "analyst": 5
+      }
+    },
+    "leaderStyle": {
+      "formId": "w29KeA",
+      "formName": "Tes Gaya Kepemimpinan",
+      "result": "suportif"
+    },
+    "learningStyle": {
+      "formName": "Tes Gaya Belajar",
+      "formId": "mV1Xla",
+      "result": "collaborative"
+    },
+    "KecerdasanEmosional": {
+      "formName": "Kecerdasan Emosional (EQ)",
+      "formId": "n9AqPX",
+      "score": {
+        "selfAwareness_empathy": 1,
+        "understanding_emotions": 1,
+        "managing_emotions": 1,
+        "using_emotions": 4
+      }
+    },
+    "enSkill": {
+      "formId": "31EvDb",
+      "formName": "Tes Kemampuan Bahasa Inggris: Seberapa Percaya Diri Kamu?",
+      "score": 53
+    },
+    "iqTest": {
+      "formId": "3xZzqo",
+      "formName": "IQ Test",
+      "score": 29,
+      "iqScore": 98,
+      "iqLabel": "Average"
+    },
+    "kreativitasInovasi": {
+      "formName": "Tes Potensi Kreativitas & Inovasi",
+      "formId": "3x8jAG",
+      "score": {
+        "kelancaran": 2,
+        "fleksibilitas": 3,
+        "orisinalitas": 1
+      }
+    }
+  },
+  "webViewLink": "https://drive.google.com/file/d/1z9FjwHxPnk_iqMWPk1MYF6A-8_MK2F7X/view?usp=drivesdk"
+}

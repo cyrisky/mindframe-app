@@ -1,0 +1,627 @@
+{
+  "testName": "kepribadian",
+  "testType": "multiple-dimension",
+  "results": {
+    "overview": "",
+    "dimensions": {
+      "openness": 
+        {
+          "tinggi": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Openness to Experience yang tinggi, ini menunjukkan kalau kamu sangat terbuka pada pengalaman baru, suka belajar hal-hal unik, dan senang mengeksplorasi ide-ide besar. Imajinasi dan kreativitasmu berkembang saat bertemu sesuatu yang belum pernah kamu coba. Gaya hidupmu cenderung penuh warna karena kamu nggak takut untuk menjelajah hal-hal baru.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu kreatif, imajinatif, dan suka mencoba hal baru. Pikiranmu terbuka dan selalu haus akan ide segar."
+                ],
+                "kelemahan": [
+                  "Karena senang eksplorasi, kamu bisa cepat bosan sama rutinitas. Kadang juga kesulitan fokus pada satu hal dalam jangka panjang."
+                ],
+                "hubunganInterpersonal": [
+                  "Kamu tertarik sama orang-orang yang unik atau berpikiran bebas. Tapi relasi bisa jadi kurang stabil kalau terlalu banyak mengejar stimulasi baru."
+                ],
+                "kepemimpinan": [
+                  "Kamu visioner dan inspiratif. Jago mencetuskan ide besar, tapi mungkin butuh orang lain untuk bantu wujudkan ide itu secara teknis."
+                ],
+                "karir": [
+                  "Kamu cocok banget di bidang yang menuntut kreativitas dan eksplorasi, seperti seni, riset, teknologi, desain, atau wirausaha."
+                ],
+                "gayaBelajar": [
+                  "Kamu suka belajar lewat metode yang aktif dan variatif, misalnya diskusi bebas, proyek eksploratif, eksperimen, atau visual yang menggugah imajinasi."
+                ]
+              },
+            "rekomendasi": [
+              {
+                "title": "Eksplorasi Minat & Ide Baru",
+                "description": "Gunakan rasa ingin tahumu dan imajinasi untuk menggali berbagai bidang sampai kamu menemukan yang benar-benar memantikmu."
+              },
+              {
+                "title": "Gaya Belajar & Pemecahan Masalah",
+                "description": "Terapkan gaya belajar berbasis eksperimen, diskusi terbuka, atau eksplorasi mandiri yang merangsang rasa ingin tahumu."
+              },
+              {
+                "title": "Penyaluran Kreativitas",
+                "description": "Pertimbangkan mengeksplorasi bidang seperti seni, teknologi, penelitian, atau desain sebagai sarana untuk menyalurkan ide-idemu."
+              }
+            ]
+          },
+          "sedang": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Openness to Experience di tingkat sedang, ini menunjukkan kalau kamu cukup terbuka terhadap ide dan pengalaman baru, tapi tetap menghargai kestabilan. Kamu bisa menikmati hal-hal kreatif dan berbeda, selama masih terasa relevan dan masuk akal. Kombinasi antara logika dan rasa ingin tahu membuatmu punya pandangan yang seimbang.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu seimbang. Bisa eksploratif saat perlu, tapi juga tetap berpijak pada realitas. Nggak gampang ikut-ikutan, tapi juga nggak tertutup terhadap hal baru."
+                ],
+                "kelemahan": [
+                  "Kadang kamu agak hati-hati saat harus mencoba hal baru. Butuh waktu buat beradaptasi, terutama saat perubahan datang tiba-tiba."
+                ],
+                "hubunganInterpersonal": [
+                  "Kamu terbuka pada banyak tipe orang, selama tetap ada nilai atau komunikasi yang kamu anggap selaras."
+                ],
+                "kepemimpinan": [
+                  "Kamu mampu menggabungkan ide-ide baru dengan pendekatan yang terstruktur. Cocok untuk memimpin tim yang butuh inovasi tapi tetap butuh arah."
+                ],
+                "karir": [
+                  "Cocok untuk posisi yang butuh pemecahan masalah dengan pendekatan praktis tapi juga kreatif, seperti analis, manajer proyek, atau pengajar."
+                ],
+                "gayaBelajar": [
+                  "Kamu belajar paling efektif lewat kombinasi. Struktur jelas, tapi juga ruang untuk diskusi, eksplorasi, atau metode kreatif lainnya."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Eksplorasi Minat & Ide Baru",
+                "description": "Lanjutkan mengeksplorasi bidang baru secara selektif sambil menjaga kerangka berpikirmu yang sistematis."
+              },
+              {
+                "title": "Gaya Belajar & Pemecahan Masalah",
+                "description": "Padukan eksplorasi dan hasil nyata dalam belajar, misalnya melalui studi kasus atau praktik langsung yang sesuai denganmu."
+              },
+              {
+                "title": "Penyaluran Kreativitas",
+                "description": "Cobalah berkontribusi dalam pengembangan konten, desain kurikulum, atau manajemen inovatif yang cocok dengan fleksibilitasmu."
+              }
+            ]
+          },
+          "rendah": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Openness to Experience yang cenderung rendah, ini menunjukkan kalau kamu lebih nyaman dengan hal-hal yang sudah kamu kenal dan rutinitas yang terstruktur. Pendekatanmu yang realistis dan praktis membantu dalam mengambil keputusan yang stabil. Meskipun kurang tertarik pada eksperimen, kamu tetap punya cara sendiri untuk menikmati hal-hal sederhana.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu realistis dan bisa diandalkan. Lebih nyaman dengan rutinitas yang jelas dan suka melakukan hal-hal dengan cara yang sudah terbukti."
+                ],
+                "kelemahan": [
+                  "Kamu mungkin kurang terbuka pada ide baru atau perubahan. Hal-hal yang terlalu 'eksperimen' bisa bikin kamu nggak nyaman."
+                ],
+                "hubunganInterpersonal": [
+                  "Kamu setia dan stabil dalam hubungan. Tapi bisa jadi kurang fleksibel dalam memahami pandangan yang sangat berbeda atau nggak biasa."
+                ],
+                "kepemimpinan": [
+                  "Kamu fokus pada efisiensi dan struktur. Cocok banget untuk memimpin di lingkungan kerja yang sudah mapan dan butuh keteraturan tinggi."
+                ],
+                "karir": [
+                  "Cocok untuk pekerjaan yang terstruktur, sistematis, dan minim perubahan, seperti administrasi, keuangan, atau teknis."
+                ],
+                "gayaBelajar": [
+                  "Kamu suka metode belajar yang konvensional, seperti ceramah, membaca, dan latihan berulang. Sistem yang rapi dan jelas bikin kamu lebih mudah memahami."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Eksplorasi Minat & Ide Baru",
+                "description": "Cobalah mengeksplorasi hal-hal baru secara bertahap agar kamu lebih terbuka terhadap kemungkinan dan variasi."
+              },
+              {
+                "title": "Gaya Belajar & Pemecahan Masalah",
+                "description": "Gunakan metode belajar yang konkret dan terstruktur untuk memperkuat pemahamanmu."
+              },
+              {
+                "title": "Penyaluran Kreativitas",
+                "description": "Pertimbangkan aktivitas yang membutuhkan pola tetap dan presisi tinggi, seperti teknisi, operator, atau pengarsipan yang sesuai dengan preferensimu."
+              }
+            ]
+          }
+        }
+      ,
+      "conscientiousness": 
+        {
+          "tinggi": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Conscientiousness yang tinggi, ini menunjukkan kalau kamu sangat teratur, teliti, dan memiliki komitmen tinggi terhadap tanggung jawabmu. Setiap tugas kamu kerjakan dengan serius, dan kamu cenderung menetapkan standar tinggi untuk dirimu sendiri. Hal ini sering membuatmu dipercaya dalam berbagai situasi, meski terkadang kamu juga merasa terbebani oleh ekspektasi.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu disiplin, teliti, dan punya komitmen tinggi. Target yang kamu tetapkan hampir selalu bisa kamu capai dengan kerja keras."
+                ],
+                "kelemahan": [
+                  "Kadang kamu terlalu perfeksionis atau kaku. Sulit menerima hasil yang nggak sesuai ekspektasi atau melepaskan kontrol."
+                ],
+                "hubunganInterpersonal": [
+                  " Kamu bisa diandalkan dan penuh tanggung jawab. Tapi mungkin kamu agak kurang ekspresif secara emosional karena terlalu fokus pada tugas."
+                ],
+                "kepemimpinan": [
+                  "Kamu tegas dan punya visi yang jelas. Cenderung mengatur dengan detail dan serius mengejar target."
+                ],
+                "karir": [
+                  "Kamu cocok banget di pekerjaan yang butuh ketelitian tinggi dan tanggung jawab besar, seperti manajemen proyek, hukum, atau akuntansi."
+                ],
+                "gayaBelajar": [
+                  "Belajar paling efektif kalau ada sistem yang jelas dan target yang konkret. Kamu suka jadwal ketat dan panduan langkah demi langkah."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Manajemen Waktu & Tujuan",
+                "description": " Gunakan kemampuan perencanaanmu untuk membagi target besar menjadi langkah-langkah sistematis."
+              },
+              {
+                "title": "Konsistensi & Tanggung Jawab",
+                "description": "Latih dirimu menerima hasil yang 'cukup baik' agar kamu tidak terjebak dalam perfeksionisme yang menghambat."
+              },
+              {
+                "title": "Kesesuaian Gaya Kerja & Karier",
+                "description": "Pertimbangkan mengembangkan karier di bidang yang menuntut disiplin tinggi seperti keuangan, hukum, riset, atau manajemen proyek yang cocok dengan karaktermu."
+              }
+            ]
+          },
+          "sedang": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Conscientiousness di tingkat sedang, ini menunjukkan kalau kamu cukup disiplin tanpa merasa perlu terlalu kaku. Kamu tahu kapan harus serius dan kapan bisa memberi ruang untuk spontanitas. Pendekatan yang seimbang ini membuatmu nyaman di antara rutinitas dan kebebasan.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu punya keseimbangan antara disiplin dan fleksibel. Bisa bekerja teratur, tapi tetap terbuka untuk penyesuaian kalau memang perlu."
+                ],
+                "kelemahan": [
+                  "Kadang kamu suka menunda tugas yang nggak terlalu menarik, atau kurang fokus ke detail penting."
+                ],
+                "hubunganInterpersonal": [
+                  "Relasimu stabil dan bisa diandalkan. Tapi kalau kamu lagi nggak terorganisir, bisa aja kehilangan konsistensi dalam hubungan."
+                ],
+                "kepemimpinan": [
+                  "Kamu cukup baik dalam memimpin, tahu kapan harus tegas dan kapan harus mendengarkan."
+                ],
+                "karir": [
+                  "Cocok di tempat kerja yang butuh tanggung jawab, tapi juga memberi ruang buat kreativitas atau kerja tim."
+                ],
+                "gayaBelajar": [
+                  "Kamu suka belajar lewat perpaduan antara struktur dan pengalaman langsung. Bisa menikmati penjelasan sistematis, tapi tetap butuh ruang untuk eksplorasi."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Manajemen Waktu & Tujuan",
+                "description": "Pertahankan ritme kerja yang seimbang dengan bantuan alat seperti kalender atau target mingguanmu."
+              },
+              {
+                "title": "Konsistensi & Tanggung Jawab",
+                "description": "Ambillah proyek berdurasi menengah untuk melatih komitmen dan tanggung jawabmu secara bertahap."
+              },
+              {
+                "title": "Kesesuaian Gaya Kerja & Karier",
+                "description": "Eksplorasi bidang yang menyeimbangkan kreativitas dan ketepatan seperti manajemen acara atau pengembangan produk yang sesuai dengan gaya kerjamu."
+              }
+            ]
+          },
+          "rendah": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Conscientiousness yang cenderung rendah, ini menunjukkan kalau kamu lebih spontan dan fleksibel dibanding orang yang sangat terstruktur. Perencanaan jangka panjang mungkin bukan gaya utamamu, tapi kamu punya cara sendiri untuk menyelesaikan sesuatu dengan caramu sendiri. Justru dalam situasi yang berubah-ubah, kamu bisa menunjukkan kemampuan beradaptasi dan kreativitasmu.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu fleksibel dan gampang beradaptasi. Cocok banget di situasi yang spontan atau nggak terlalu terstruktur."
+                ],
+                "kelemahan": [
+                  "Kadang kamu gampang terdistraksi dan suka menunda-nunda tugas. Menyelesaikan sesuatu sesuai target bisa jadi tantangan."
+                ],
+                "hubunganInterpersonal": [
+                  "Santai dan asyik saat bersosialisasi. Tapi kadang bisa dianggap nggak konsisten atau kurang bisa diandalkan dalam janji sosial."
+                ],
+                "kepemimpinan": [
+                  "Kamu punya gaya kepemimpinan yang nggak kaku dan bisa menginspirasi. Tapi mungkin masih perlu belajar soal perencanaan dan manajemen waktu."
+                ],
+                "karir": [
+                  "Kamu cocok di bidang yang kreatif, fleksibel, dan nggak banyak aturan ketat, seperti desain, seni, atau start-up yang dinamis."
+                ],
+                "gayaBelajar": [
+                  "Belajar paling oke lewat praktik langsung, diskusi, atau eksplorasi bebas. Kamu nggak terlalu suka belajar dengan cara yang terlalu kaku atau banyak aturan."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Manajemen Waktu & Tujuan",
+                "description": "Mulailah membangun rutinitas sederhana seperti membuat daftar tugas harian untuk meningkatkan keteraturanmu."
+              },
+              {
+                "title": "Konsistensi & Tanggung Jawab",
+                "description": "Cobalah mengambil proyek kecil yang menantangmu untuk menyelesaikan tanggung jawab hingga tuntas."
+              },
+              {
+                "title": "Kesesuaian Gaya Kerja & Karier",
+                "description": "Pertimbangkan bidang fleksibel dengan struktur pendukung seperti desain, proyek seni, atau lingkungan startup yang bisa kamu eksplorasi."
+              }
+            ]
+          }
+        }
+      ,
+      "extraversion": 
+        {
+          "tinggi": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Extraversion yang tinggi, ini menunjukkan kalau kamu penuh energi, mudah bergaul, dan menyukai lingkungan yang ramai. Kehadiranmu sering menghidupkan suasana, dan kamu senang terlibat dalam aktivitas bersama banyak orang. Interaksi sosial menjadi salah satu sumber semangat terbesarmu.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu penuh energi, mudah bergaul, dan cepat membangun koneksi. Nggak susah buat kamu jadi pusat perhatian atau memimpin pembicaraan."
+                ],
+                "kelemahan": [
+                  "Saat sendirian, kamu bisa merasa bosan atau kehilangan fokus. Kadang kamu juga terlalu impulsif atau terlalu peduli pada pendapat orang."
+                ],
+                "hubunganInterpersonal": [
+                  "Relasi kamu luas dan penuh warna. Kamu suka bertemu banyak orang, tapi tetap perlu belajar membangun hubungan yang lebih dalam dan bermakna."
+                ],
+                "kepemimpinan": [
+                  "Kamu karismatik dan inspiratif. Energi kamu menular, tapi pastikan juga tetap tenang dan nggak terburu-buru saat ambil keputusan."
+                ],
+                "karir": [
+                  "Kamu cocok di bidang yang banyak melibatkan interaksi sosial dan persuasi, seperti sales, PR, marketing, atau dunia hiburan."
+                ],
+                "gayaBelajar": [
+                  "Kamu belajar paling efektif lewat diskusi, pengalaman langsung, dan aktivitas kelompok. Kamu butuh variasi dan suasana yang hidup biar tetap semangat."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Keterampilan Interpersonal",
+                "description": "Gunakan energi sosialmu untuk membangun networking, menjadi pembicara, atau berperan aktif dalam lingkunganmu."
+              },
+              {
+                "title": "Ekspresi Diri & Kepercayaan Diri",
+                "description": "Asah kemampuan mendengarkan agar interaksimu lebih seimbang dan tidak hanya satu arah."
+              },
+              {
+                "title": "Pemilihan Aktivitas Sosial",
+                "description": "Pertimbangkan mengejar bidang seperti komunikasi, event organizing, atau konten kreatif yang cocok dengan kebutuhan interaksimu yang tinggi."
+              }
+            ]
+          },
+          "sedang": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Extraversion di tingkat sedang, ini menunjukkan kalau kamu bisa menikmati keramaian sekaligus merasa nyaman saat sendiri. Kamu tahu kapan harus bersosialisasi dan kapan butuh waktu untuk diri sendiri. Kemampuan ini membuatmu fleksibel dalam berbagai situasi sosial, tanpa merasa terkuras.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu fleksibel. Bisa nyaman di tengah keramaian, tapi juga oke bekerja sendiri. Punya kemampuan menyesuaikan diri dalam berbagai situasi sosial."
+                ],
+                "kelemahan": [
+                  "Kadang kamu bingung nentuin kapan butuh waktu sendiri dan kapan harus bersosialisasi. Kalau nggak dijaga, bisa gampang kelelahan."
+                ],
+                "hubunganInterpersonal": [
+                  "Relasi kamu seimbang dan bermakna. Kamu bisa nyambung dengan banyak orang, tapi tetap tahu batas dan nggak kehilangan diri sendiri."
+                ],
+                "kepemimpinan": [
+                  "Kamu cenderung terbuka dan partisipatif. Bisa memimpin tim sekaligus mendengarkan dengan baik."
+                ],
+                "karir": [
+                  "Cocok di peran yang butuh kerja tim tapi juga memberi ruang kerja individu, seperti HR, konsultan, atau pengajar."
+                ],
+                "gayaBelajar": [
+                  "Kamu suka belajar dengan gabungan diskusi kelompok dan waktu belajar pribadi. Keseimbangan antara interaksi dan refleksi bikin kamu berkembang optimal."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Keterampilan Interpersonal",
+                "description": "Manfaatkan fleksibilitasmu untuk menjadi penghubung dalam tim atau lingkungan yang beragam."
+              },
+              {
+                "title": "Ekspresi Diri & Kepercayaan Diri",
+                "description": "Kembangkan ekspresi dirimu baik di ruang publik maupun dalam refleksi personal untuk menyeimbangkan energi sosialmu."
+              },
+              {
+                "title": "Pemilihan Aktivitas Sosial",
+                "description": "Cobalah terlibat dalam aktivitas kolaboratif seperti fasilitasi diskusi, mentoring, atau koordinasi proyek."
+              }
+            ]
+          },
+          "rendah": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Extraversion yang cenderung rendah, ini menunjukkan kalau kamu lebih nyaman dalam suasana yang tenang dan cenderung menikmati waktu sendirian. Aktivitas yang bersifat pribadi dan mendalam lebih cocok dengan caramu mengisi energi. Dalam hubungan sosial, kamu lebih memilih kualitas daripada kuantitas.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu reflektif, fokus, dan bisa bekerja secara mendalam tanpa mudah terdistraksi. Jago banget dalam mendengarkan dan menganalisis."
+                ],
+                "kelemahan": [
+                  "Kadang kamu merasa canggung saat harus bersosialisasi, dan bisa kurang percaya diri kalau harus bicara di depan orang."
+                ],
+                "hubunganInterpersonal": [
+                  "Hubungan yang kamu jalin biasanya nggak banyak, tapi sangat dalam dan berarti. Kamu lebih nyaman ngobrol satu lawan satu daripada ramai-ramai."
+                ],
+                "kepemimpinan": [
+                  "Kamu bijak dan hati-hati dalam mengambil keputusan. Tapi kamu mungkin perlu belajar lebih terbuka dan percaya diri saat harus memimpin atau memberi arahan."
+                ],
+                "karir": [
+                  "Kamu cocok di pekerjaan yang fokus pada analisis, kerja mandiri, dan minim interaksi sosial intens, seperti penulis, peneliti, atau analis data."
+                ],
+                "gayaBelajar": [
+                  "Kamu belajar paling efektif sendiri, dalam suasana yang tenang. Membaca, mencatat, dan merenung jadi kekuatanmu."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Keterampilan Interpersonal",
+                "description": "Mulailah membangun relasi lewat percakapan pribadi satu lawan satu untuk memperkuat koneksi sosialmu."
+              },
+              {
+                "title": "Ekspresi Diri & Kepercayaan Diri",
+                "description": "Latih kemampuanmu menyampaikan pendapat lewat forum kecil atau media tertulis seperti journaling."
+              },
+              {
+                "title": "Pemilihan Aktivitas Sosial",
+                "description": "Pertimbangkan mengambil peran yang memungkinkanmu kerja mandiri namun tetap berdampak, seperti penulisan atau analisis."
+              }
+            ]
+          }
+        },
+      "agreeableness": 
+        {
+          "tinggi": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Agreeableness yang tinggi, ini menunjukkan kalau kamu adalah pribadi yang hangat, penuh perhatian, dan mudah peduli pada orang lain. Kepedulianmu terasa tulus, dan kamu cenderung mengutamakan keharmonisan dalam hubungan. Karena itu, kamu sering jadi tempat bersandar bagi orang-orang di sekitarmu.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu empatik banget, mudah dipercaya, dan suka membantu. Sering jadi penyejuk suasana di dalam kelompok."
+                ],
+                "kelemahan": [
+                  "Kamu mungkin kesulitan bilang 'tidak', terlalu mengalah, dan bisa dimanfaatkan orang yang kurang tulus."
+                ],
+                "hubunganInterpersonal": [
+                  "Kamu hangat dan suportif, tapi tetap perlu belajar menjaga ruang pribadi biar nggak terlalu lelah secara emosional."
+                ],
+                "kepemimpinan": [
+                  "Kamu mengayomi dan partisipatif, tapi cenderung menghindari konflik atau keputusan sulit."
+                ],
+                "karir": [
+                  "Cocok di bidang yang butuh empati dan kerja tim, seperti HR, kesehatan, pendidikan, atau pelayanan publik."
+                ],
+                "gayaBelajar": [
+                  "Kamu berkembang dalam suasana belajar yang kolaboratif, penuh diskusi, dan kerja kelompok."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Empati & Perspektif",
+                "description": "Salurkan empati melalui aktivitas sosial atau layanan yang secara langsung membantu orang-orang di sekitarmu."
+              },
+              {
+                "title": "Kolaborasi & Kerja Tim",
+                "description": "Tetapkan batas pribadi agar kamu tidak terlalu mengorbankan diri dalam relasi atau kerja tim."
+              },
+              {
+                "title": "Peran Sosial & Relasional",
+                "description": "Pertimbangkan menyalurkan kepekaan sosialmu melalui profesi seperti konseling, psikologi, atau pelayanan publik."
+              }
+            ]
+          },
+          "sedang": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Agreeableness di tingkat sedang, ini menunjukkan kalau kamu bisa menjaga keseimbangan antara empati dan asertivitas. Kamu cukup mudah bergaul dan menghargai kerja sama, tapi juga nggak segan mempertahankan pandanganmu sendiri. Pendekatan ini membuatmu fleksibel dalam berbagai situasi sosial, baik yang butuh kehangatan maupun ketegasan.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu punya keseimbangan antara asertif dan empati. Bisa memahami orang lain tanpa mengabaikan kebutuhan diri sendiri."
+                ],
+                "kelemahan": [
+                  "Kadang kamu merasa bingung saat harus memilih antara menyenangkan orang atau mempertahankan pendirian, terutama saat ada tekanan."
+                ],
+                "hubunganInterpersonal": [
+                  "Kamu bisa menjalin hubungan yang sehat dan beragam, dengan batasan pribadi yang tetap terjaga."
+                ],
+                "kepemimpinan": [
+                  "Kamu terbuka pada masukan dan menciptakan suasana kerja yang kolaboratif."
+                ],
+                "karir": [
+                  "Fleksibel, bisa kerja sendiri atau dalam tim. Cocok buat kamu yang bisa menyeimbangkan dua dunia itu."
+                ],
+                "gayaBelajar": [
+                  "Kamu cocok belajar mandiri sekaligus berdiskusi. Lingkungan belajar yang interaktif dan terarah jadi tempat idealmu."
+                ]
+              },
+            "rekomendasi": [
+              {
+                "title": "Empati & Perspektif",
+                "description": "Kembangkan keseimbangan antara kepedulian dan ketegasan dalam membangun hubungan sosialmu."
+              },
+              {
+                "title": "Kolaborasi & Kerja Tim",
+                "description": "Terlibatlah dalam tim lintas latar belakang dan karakter untuk meningkatkan keluwesanmu dalam kerja kolaboratif."
+              },
+              {
+                "title": "Peran Sosial & Relasional",
+                "description": "Cobalah mengambil peran yang memerlukan interaksi interpersonal, namun tetap menjaga batas personalmu, seperti edukasi atau HR."
+              }
+            ]
+          },
+          "rendah": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Agreeableness yang cenderung rendah, ini menunjukkan kalau kamu lebih mandiri dan terbiasa mengandalkan pendirian sendiri. Daripada menyesuaikan diri demi menjaga harmoni, kamu lebih memilih untuk bersikap jujur dan langsung. Gaya komunikasi seperti ini sering membuatmu terlihat tegas, bahkan saat berbeda pendapat.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu mandiri dan objektif. Bisa berpikir kritis dan membuat keputusan logis tanpa terlalu terpengaruh emosi atau tekanan orang lain."
+                ],
+                "kelemahan": [
+                  "Kamu mungkin terlihat kurang peduli atau empati, yang bisa bikin orang salah paham atau terjadi konflik kecil."
+                ],
+                "hubunganInterpersonal": [
+                  "Biasanya kamu punya sedikit hubungan yang benar-benar dekat. Kamu cenderung menjaga jarak dan menghindari hubungan yang terlalu intens."
+                ],
+                "kepemimpinan": [
+                  "Tegas dan fokus pada hasil. Tapi, kamu mungkin perlu belajar lebih empati dan membangun koneksi emosional dengan tim."
+                ],
+                "karir": [
+                  "Kamu cocok di pekerjaan yang butuh analisis rasional, independensi, dan nggak terlalu banyak interaksi emosional."
+                ],
+                "gayaBelajar": [
+                  "Lebih suka belajar sendiri, di suasana yang tenang. Diskusi kelompok bukan favorit kamu, tapi refleksi pribadi jadi kekuatanmu."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Empati & Perspektif",
+                "description": "Latih empati dengan lebih sering mendengarkan secara aktif dan mencoba memahami emosi orang lain tanpa menghakimi."
+              },
+              {
+                "title": "Kolaborasi & Kerja Tim",
+                "description": "Cobalah terlibat dalam kerja tim kecil untuk mengembangkan kemampuanmu dalam berkompromi dan berkomunikasi terbuka."
+              },
+              {
+                "title": "Peran Sosial & Relasional",
+                "description": "Pertimbangkan menyalurkan kekuatan objektif dan analitismu dalam peran berbasis data, kebijakan, atau evaluasi sistem."
+              }
+            ]
+          }
+        },
+      "neuroticism":
+        {
+          "tinggi": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Neuroticism yang tinggi, ini menunjukkan kalau kamu cenderung sensitif, mudah cemas, dan lebih rentan terhadap tekanan. Pikiranmu sering dipenuhi kekhawatiran yang sulit dijelaskan, apalagi saat stres datang. Meski begitu, kamu juga punya empati yang besar karena sangat memahami perasaan orang lain.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu sangat peka dan empatik. Bisa merasakan suasana hati orang lain dengan mudah, dan punya kemampuan mengubah pengalaman emosional jadi ide atau karya."
+                ],
+                "kelemahan": [
+                  "Kamu cenderung mudah cemas, gampang khawatir, dan kadang sulit mengontrol emosi, terutama saat stres."
+                ],
+                "hubunganInterpersonal": [
+                  "Kamu bisa membangun hubungan yang sangat dalam dan emosional. Tapi perlu hati-hati, karena risiko ketergantungan emosional atau konflik juga tinggi."
+                ],
+                "kepemimpinan": [
+                  "Kamu bisa membentuk ikatan emosional yang kuat dengan tim. Tapi perlu belajar lebih tenang dan tegas agar nggak mudah terbawa suasana."
+                ],
+                "karir": [
+                  "Kamu cocok di bidang yang menuntut empati tinggi dan kepekaan emosional, seperti seni, psikologi, layanan sosial, atau desain."
+                ],
+                "gayaBelajar": [
+                  "Kamu butuh lingkungan belajar yang suportif dan penuh pengertian. Tutor atau teman belajar yang sabar bisa sangat membantu perkembanganmu."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Manajemen Emosi",
+                "description": "Pelajari teknik coping seperti mindfulness atau dukungan sosial untuk menenangkan pikiranmu saat cemas atau overthinking."
+              },
+              {
+                "title": "Kesadaran Diri & Refleksi",
+                "description": "Gunakan sensitivitas emosionalmu untuk menciptakan karya yang menyentuh, atau untuk mendampingi orang lain secara empatik."
+              },
+              {
+                "title": "Ketahanan dalam Tekanan",
+                "description": "Pertimbangkan menyalurkan energi emosionalmu ke bidang seperti terapi, seni ekspresif, atau peran pendamping psikososial."
+              }
+            ]
+          },
+          "sedang": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Neuroticism di tingkat sedang, ini menunjukkan kalau kamu cukup peka terhadap perubahan emosi, tapi masih bisa mengelolanya dengan baik. Ada kalanya kamu merasa cemas atau sensitif, namun kamu tetap bisa menjaga kendali. Kesadaran emosional ini justru membantumu mengenal diri sendiri lebih dalam.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu cukup stabil secara emosional, tapi tetap peka terhadap perasaan orang lain. Kamu tahu cara mengatur emosi, terutama dalam tekanan ringan sampai sedang."
+                ],
+                "kelemahan": [
+                  "Saat dihadapkan pada banyak pilihan atau tekanan besar, kamu bisa merasa cemas, ragu, atau terlalu fokus pada kemungkinan terburuk."
+                ],
+                "hubunganInterpersonal": [
+                  "Kamu bisa membangun hubungan yang suportif dan sehat. Empati kamu kuat, tapi tetap bisa menjaga emosi sendiri dengan baik."
+                ],
+                "kepemimpinan": [
+                  "Kamu perhatian terhadap tim dan bisa jadi pemimpin yang suportif. Tapi perlu lebih percaya diri dan tegas saat mengambil keputusan penting."
+                ],
+                "karir": [
+                  "Kamu cocok di pekerjaan yang butuh keseimbangan antara empati dan kestabilan, misalnya di bidang pelayanan publik, konseling, atau HR."
+                ],
+                "gayaBelajar": [
+                  "Kamu belajar paling baik di lingkungan yang aman, suportif, dan memberi tantangan secukupnya. Tekanan ringan justru bisa memotivasimu."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Manajemen Emosi",
+                "description": "Kembangkan teknik sederhana seperti journaling atau relaksasi untuk membantumu menjaga kestabilan saat tekanan meningkat."
+              },
+              {
+                "title": "Kesadaran Diri & Refleksi",
+                "description": "Gunakan kepekaan emosionalmu untuk memperkuat relasi dan membangun rasa percaya di sekitarmu."
+              },
+              {
+                "title": "Ketahanan dalam Tekanan",
+                "description": "Cobalah berkontribusi di bidang yang menuntut empati dan penyesuaian emosi seperti edukasi, konseling ringan, atau pengembangan tim."
+              }
+            ]
+          },
+          "rendah": {
+            "overview": "",
+            "interpretation": "Kamu memiliki Neuroticism yang cenderung rendah, ini menunjukkan kalau kamu cukup stabil secara emosional dan nggak mudah terbawa stres. Dalam menghadapi tantangan, kamu tetap tenang dan mampu melihat situasi dengan kepala dingin. Pandangan positif ini membuatmu lebih tahan banting dalam banyak hal.",
+            "aspekKehidupan": 
+              {
+                "kekuatan": [
+                  "Kamu tenang, stabil secara emosional, dan nggak gampang panik. Dalam situasi penuh tekanan pun kamu tetap bisa berpikir jernih."
+                ],
+                "kelemahan": [
+                  "Karena terlalu stabil, kamu kadang bisa terlihat cuek atau kurang peka terhadap perasaan orang lain. Bisa juga jadi terlalu percaya diri dan lupa mempertimbangkan risiko."
+                ],
+                "hubunganInterpersonal": [
+                  "Hubungan kamu cenderung bebas drama dan stabil. Tapi kadang orang lain bisa merasa kamu 'jauh' karena nggak terlalu terbuka secara emosional."
+                ],
+                "kepemimpinan": [
+                  "Kamu cocok jadi pemimpin di situasi penuh tekanan. Kamu tenang dan konsisten, meskipun kadang terlihat terlalu kaku atau datar."
+                ],
+                "karir": [
+                  "Pekerjaan yang butuh konsistensi, fokus, dan pengambilan keputusan rasional cocok banget buat kamu, seperti manajemen, finansial, atau logistik."
+                ],
+                "gayaBelajar": [
+                  "Kamu tetap fokus meski ada tantangan atau tekanan. Belajar dalam situasi yang menantang malah bisa bikin kamu makin semangat."
+                ]
+              }
+            ,
+            "rekomendasi": [
+              {
+                "title": "Manajemen Emosi",
+                "description": "Gunakan stabilitas emosionalmu untuk menjadi sumber ketenangan dalam situasi sulit atau dalam tim yang dinamis."
+              },
+              {
+                "title": "Kesadaran Diri & Refleksi",
+                "description": "Perluas wawasan emosional dengan mencoba memahami perasaan orang lain yang lebih sensitif atau reaktif."
+              },
+              {
+                "title": "Ketahanan dalam Tekanan",
+                "description": "Pertimbangkan mengambil peran di bidang pengambilan keputusan cepat, kepemimpinan, atau krisis management yang sesuai dengan ketahanan emosionalmu."
+              }
+            ]
+          }
+        }
+    }
+  },
+  "isActive": true,
+  "createdAt": "2023-08-10T10:00:00.000Z",
+  "updatedAt": "2023-08-10T10:00:00.000Z"
+}

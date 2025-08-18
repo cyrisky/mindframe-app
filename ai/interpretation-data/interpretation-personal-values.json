@@ -1,0 +1,76 @@
+{
+  "testName": "personalValues",
+  "testType": "top-n-dimension",
+  "results": {
+    "topN": 3,
+    "dimensions": {
+      "selfDirection": {
+        "title": "Kemandirian (Self-Direction)",
+        "description": "Bagi Kamu, kebebasan adalah segalanya. Kamu sangat menghargai kemampuan untuk berpikir secara mandiri, membuat pilihan sendiri, dan mengeksplorasi ide-ide baru. Kreativitas dan rasa ingin tahu adalah bahan bakar Kamu. Kamu tidak suka dibatasi oleh aturan kaku dan lebih memilih untuk menentukan jalan Kamu sendiri.",
+        "manifestation": "Kamu adalah orang yang suka bereksperimen, mempertanyakan status quo, dan memiliki proyek pribadi. Kamu merasa paling hidup saat diberi otonomi dan kepercayaan untuk mengatur pekerjaan atau hidup Kamu sesuai dengan cara Kamu.",
+        "strengthChallenges": "Kekuatan terbesar Kamu adalah inisiatif, orisinalitas, dan kemampuan untuk mandiri. Kamu adalah seorang inovator alami. Potensi tantangannya, Kamu mungkin merasa kesulitan bekerja dalam lingkungan yang sangat birokratis atau di bawah pengawasan yang ketat (micromanagement)."
+      },
+       "security": {
+        "title": "Keamanan (Security)",
+        "description": "Bagi Kamu, prioritas utama adalah stabilitas, keselamatan, dan harmoni. Kamu membutuhkan rasa aman, baik dalam hubungan, pekerjaan, maupun lingkungan sosial. Prediktabilitas dan keteraturan membuat Kamu merasa tenang.",
+        "manifestation": "Kamu adalah perencana yang baik, menghindari risiko yang tidak perlu, dan sangat setia dalam hubungan. Kamu lebih memilih lingkungan yang stabil dan damai daripada yang penuh gejolak dan ketidakpastian.",
+        "strengthChallenges": "Kekuatan Kamu adalah kehati-hatian, kesetiaan, dan kemampuan untuk menciptakan lingkungan yang aman dan stabil bagi diri sendiri dan orang lain. Kamu sangat bisa diandalkan. Potensi tantangannya, Kamu mungkin terlalu enggan untuk mengambil risiko atau mencoba hal baru, yang bisa membuat Kamu kehilangan beberapa peluang."
+      },
+       "stimulation": {
+        "title": "Stimulasi (Stimulation)",
+        "description": "Bagi Kamu, hidup adalah tentang kegembiraan, kebaruan, dan tantangan. Rutinitas adalah musuh Kamu. Kamu selalu mencari pengalaman-pengalaman baru yang memacu adrenalin dan membuat hidup terasa lebih berwarna.",
+        "manifestation": "Kamu adalah orang pertama yang mencoba hal baru, entah itu makanan, hobi, atau destinasi liburan. Kamu menyukai variasi dalam pekerjaan dan kehidupan, dan cepat merasa bosan jika segala sesuatunya terlalu monoton.",
+        "strengthChallenges": "Kekuatan Kamu adalah energi yang tinggi, keberanian mengambil risiko, dan kemampuan beradaptasi dengan cepat terhadap perubahan. Kamu membawa semangat ke dalam setiap ruangan. Potensi tantangannya, Kamu mungkin kesulitan untuk fokus pada proyek jangka panjang yang membutuhkan konsistensi dan kesabaran."
+      },
+       "conformity": {
+        "title": "Konformitas (Conformity)",
+        "description": "Bagi Kamu, menjaga harmoni sosial adalah hal yang penting. Kamu berusaha untuk tidak melanggar aturan atau ekspektasi sosial, dan percaya bahwa menahan diri dari tindakan yang bisa menyakiti orang lain adalah sebuah keharusan. Kamu adalah orang yang sopan dan bisa menempatkan diri.",
+        "manifestation": "Kamu cenderung mengikuti aturan, menghormati orang yang lebih tua atau senior, dan sangat berhati-hati dalam perkataan dan perbuatan. Kamu tidak suka menciptakan konflik dan berusaha untuk menjadi bagian yang baik dari sebuah kelompok.",
+        "strengthChallenges": "Kekuatan Kamu adalah Kamu seorang anggota tim yang hebat, kooperatif, dan bisa diandalkan untuk menjaga keharmonisan. Kamu mudah bergaul. Potensi tantangannya, Kamu mungkin kesulitan untuk menyuarakan pendapat yang berbeda atau mengatakan 'tidak', bahkan ketika itu diperlukan."
+      },
+       "hedonism": {
+        "title": "Hedonisme (Hedonism)",
+        "description": "Bagi Kamu, hidup adalah untuk dinikmati. Kamu sangat menghargai kesenangan, kenyamanan, dan kepuasan indrawi. Kamu bekerja keras agar bisa menikmati hasil jerih payah Kamu sepenuhnya, baik itu melalui makanan enak, liburan yang nyaman, atau hiburan yang berkualitas.",
+        "manifestation": "Kamu tahu cara memanjakan diri sendiri dan orang lain. Kamu pandai menciptakan suasana yang menyenangkan dan menghargai kualitas dalam setiap aspek kehidupan. Kamu termotivasi oleh imbalan yang bisa Kamu nikmati.",
+        "strengthChallenges": "Kekuatan Kamu adalah kemampuan untuk menikmati momen saat ini (live in the present) dan menjaga keseimbangan antara kerja dan hiburan. Kamu tahu pentingnya self-care. Potensi tantangannya, Kamu mungkin perlu waspada agar tidak terlalu impulsif atau mengorbankan tujuan jangka panjang demi kesenangan sesaat."
+      },
+       "tradition": {
+        "title": "Tradisi (Tradition)",
+        "description": "Bagi Kamu, tradisi memberikan rasa identitas dan kesinambungan. Kamu memiliki rasa hormat yang mendalam terhadap adat istiadat, simbol, dan gagasan dari budaya atau agama Kamu. Kamu berkomitmen pada keyakinan dan tradisi yang telah diwariskan.",
+        "manifestation": "Kamu mungkin sangat menghargai ritual keluarga, perayaan hari besar keagamaan, dan memegang teguh ajaran-ajaran tradisional. Kamu merasa nyaman dengan hal-hal yang sudah teruji oleh waktu.",
+        "strengthChallenges": "Kekuatan Kamu adalah rasa identitas yang kuat, kesetiaan pada kelompok, dan kemampuan untuk menjadi penjaga nilai-nilai luhur. Kamu memberikan stabilitas pada komunitas Kamu. Potensi tantangannya, Kamu mungkin kurang terbuka terhadap perubahan atau cara pandang baru yang berbeda dari tradisi Kamu."
+      },
+       "achievement": {
+        "title": "Prestasi (Achievement)",
+        "description": "Bagi Kamu, motivasi utama adalah kesuksesan dan pengakuan. Kamu ingin menunjukkan kompetensi Kamu dan diakui sebagai orang yang mampu dan berhasil sesuai dengan standar sosial. Ambisi adalah nama tengah Kamu.",
+        "manifestation": "Kamu adalah orang yang berorientasi pada tujuan (goal-oriented), kompetitif (dengan cara yang sehat), dan selalu berusaha memberikan yang terbaik. Kamu mendapatkan kepuasan besar dari pencapaian target dan menerima pujian atas kerja keras Kamu.",
+        "strengthChallenges": "Kekuatan Kamu adalah ambisi, etos kerja yang kuat, dan fokus pada hasil. Kamu adalah seorang high-achiever yang bisa diandalkan. Potensi tantangannya, Kamu mungkin berisiko menjadi seorang workaholic dan bisa jadi terlalu keras pada diri sendiri (dan orang lain) jika standar tidak tercapai."
+      },
+       "benevolence": {
+        "title": "Kebaikan Hati (Benevolence)",
+        "description": "Bagi Kamu, kebahagiaan orang-orang di lingkaran terdekat (keluarga dan teman) adalah segalanya. Kamu adalah orang yang suportif, pemaaf, jujur dalam hubungan, dan setia. Kesejahteraan mereka adalah prioritas utama Kamu.",
+        "manifestation": "Kamu adalah orang yang selalu ada untuk teman saat mereka butuh bantuan. Kamu pendengar yang baik, suka memberi, dan secara aktif berusaha untuk membuat orang-orang yang Kamu sayangi merasa nyaman dan bahagia.",
+        "strengthChallenges": "Kekuatan Kamu adalah empati, kehangatan, dan kemampuan untuk membangun hubungan yang dalam dan saling percaya. Kamu adalah 'perekat' dalam lingkaran sosial Kamu. Potensi tantangannya, Kamu mungkin berisiko mengorbankan kebutuhan diri sendiri demi orang lain atau merasa dimanfaatkan jika tidak menetapkan batasan."
+      },
+       "power": {
+        "title": "Kekuasaan (Power)",
+        "description": "Kekuasaan (Power)",
+        "manifestation": "Kamu secara alami mengambil peran kepemimpinan, suka berada dalam posisi yang berpengaruh, dan menikmati pengakuan sosial. Kamu pandai dalam berdebat dan meyakinkan orang lain.",
+        "strengthChallenges": "Kekuatan Kamu adalah kepercayaan diri, ketegasan, dan kemampuan untuk memimpin. Kamu tidak takut mengambil tanggung jawab besar. Potensi tantangannya, Kamu perlu memastikan bahwa dorongan ini digunakan untuk kebaikan bersama, bukan hanya untuk dominasi, dan belajar untuk mendengarkan masukan dari orang lain."
+      },
+       "universalism": {
+        "title": "Universalisme (Universalism)",
+        "description": "Bagi Kamu, kepedulian meluas melampaui lingkaran terdekat, mencakup semua orang dan alam. Kamu menghargai toleransi, keadilan sosial, kesetaraan, dan perlindungan terhadap lingkungan. Kamu percaya pada kebijaksanaan dan keindahan dunia.",
+        "manifestation": "Kamu mungkin peduli pada isu-isu sosial atau lingkungan, menikmati keberagaman budaya, dan berusaha untuk bersikap adil kepada semua orang. Kamu memiliki rasa keterhubungan dengan kemanusiaan secara keseluruhan.",
+        "strengthChallenges": "Kekuatan Kamu adalah wawasan yang luas, rasa keadilan yang tinggi, dan kemampuan untuk melihat gambaran besar. Kamu adalah seorang visioner yang peduli. Potensi tantangannya, Kamu mungkin merasa terbebani oleh banyaknya masalah di dunia atau merasa frustrasi ketika berhadapan dengan ketidakadilan yang sistemik."
+      }
+    }
+  },
+  "isActive": true,
+  "createdAt": {
+    "$date": "2023-08-10T10:00:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2023-08-10T10:00:00.000Z"
+  }
+}

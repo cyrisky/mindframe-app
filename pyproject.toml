@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mindframe-app"
+version = "0.1.0"
+description = "Psychological Test Report Generator using WeasyPrint"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    {name = "Mindframe Team", email = "team@mindframe.com"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "weasyprint>=61.0",
+    "flask>=2.3.0",
+    "jinja2>=3.1.0",
+    "pymongo>=4.0.0",
+    "redis>=4.5.0",
+    "celery>=5.3.0",
+    "google-cloud-drive>=3.0.0",
+    "google-cloud-secret-manager>=2.16.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/mindframe/mindframe-app"
+Repository = "https://github.com/mindframe/mindframe-app.git"
+Issues = "https://github.com/mindframe/mindframe-app/issues"
+
+[tool.setuptools.packages.find]
+where = ["backend/src"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
