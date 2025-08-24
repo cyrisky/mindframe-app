@@ -8,12 +8,13 @@ services:
     image: redis:6.0-alpine
     container_name: mindframe-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     volumes:
       - redis_data:/data
     networks:
       - mindframe-network
+      - dokploy-network
 
   # Backend API
   backend:
@@ -22,8 +23,14 @@ services:
       dockerfile: Dockerfile
     container_name: mindframe-backend
     restart: unless-stopped
-    ports:
-      - "5001:5001"
+    expose:
+      - "5001"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-app.rule=Host(`api.your-domain.com`)"
+      - "traefik.http.routers.backend-app.entrypoints=web"
+      - "traefik.http.services.backend-app.loadbalancer.server.port=5001"
+      - "traefik.docker.network=dokploy-network"
     environment:
       # Core Application
       FLASK_ENV: production
@@ -63,6 +70,7 @@ services:
       - ./backend/templates:/app/templates
     networks:
       - mindframe-network
+      - dokploy-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
       interval: 30s
@@ -78,32 +86,39 @@ services:
         REACT_APP_API_URL: http://localhost:5001
     container_name: mindframe-frontend
     restart: unless-stopped
-    ports:
-      - "80:80"
+    expose:
+      - "80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend-app.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.frontend-app.entrypoints=web"
+      - "traefik.http.services.frontend-app.loadbalancer.server.port=80"
+      - "traefik.docker.network=dokploy-network"
     depends_on:
       - backend
     networks:
       - mindframe-network
+      - dokploy-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  # Nginx Reverse Proxy (Optional)
-  nginx:
-    image: nginx:alpine
-    container_name: mindframe-nginx
-    restart: unless-stopped
-    ports:
-      - "8080:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - mindframe-network
+  # Nginx Reverse Proxy (Optional - disable if using Dokploy Traefik)
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: mindframe-nginx
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8080:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #   depends_on:
+  #     - frontend
+  #     - backend
+  #   networks:
+  #     - mindframe-network
 
 volumes:
   redis_data:
@@ -112,3 +127,5 @@ volumes:
 networks:
   mindframe-network:
     driver: bridge
+  dokploy-network:
+    external: true

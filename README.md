@@ -80,6 +80,29 @@ mindframe-app/
    - Backend API: http://localhost:5001
    - Nginx Proxy: http://localhost:80
 
+### Production Deployment with Dokploy
+
+For production deployment using Dokploy:
+
+1. **Prepare your repository**
+   - Ensure your code is in a Git repository accessible to Dokploy
+   - Configure your environment variables
+
+2. **Deploy with Dokploy**
+   ```bash
+   # Use Dokploy's Docker Compose deployment feature
+   # Configure domain and SSL in Dokploy dashboard
+   ```
+
+**Dokploy Features:**
+- Automatic SSL certificates with Let's Encrypt
+- Custom domain management
+- Traefik reverse proxy integration
+- Container orchestration and monitoring
+- Centralized logging and metrics
+
+For detailed Dokploy setup instructions, see `DOKPLOY_SETUP.md`.
+
 ### Alternative: Local Development Setup
 
 #### Prerequisites
@@ -160,6 +183,8 @@ Built on WeasyPrint with enhanced template processing:
 - **Backend**: See `backend/README.md` for detailed backend documentation
 - **Frontend**: See `frontend/README.md` for frontend setup and development
 - **Docker**: See `DOCKER_DEPLOYMENT.md` for complete Docker deployment guide
+- **Dokploy**: See `DOKPLOY_SETUP.md` for production deployment with Dokploy
+- **Dokploy Troubleshooting**: See `DOKPLOY_TROUBLESHOOTING.md` for troubleshooting Dokploy issues
 - **External MongoDB**: See `EXTERNAL_MONGODB_SETUP.md` for MongoDB setup guide
 
 ## License
