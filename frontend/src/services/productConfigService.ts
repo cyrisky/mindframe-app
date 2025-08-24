@@ -11,7 +11,7 @@ export const productConfigService = {
   getAll: async (): Promise<ProductConfig[]> => {
     try {
       const response = await apiClient.get('/api/admin/product-configs');
-      return response.data;
+      return response.data.productConfigs || [];
     } catch (error) {
       console.error('Error fetching product configurations:', error);
       throw error;
@@ -86,7 +86,7 @@ export const productConfigService = {
   // Toggle active status
   toggleActive: async (id: string): Promise<ProductConfig> => {
     try {
-      const response = await apiClient.patch(`/api/admin/product-configs/${id}/toggle-active`);
+      const response = await apiClient.patch(`/api/admin/product-configs/${id}/toggle`);
       return response.data;
     } catch (error) {
       console.error('Error toggling product configuration status:', error);

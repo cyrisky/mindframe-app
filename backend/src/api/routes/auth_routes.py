@@ -1,14 +1,33 @@
 """Authentication routes for the mindframe application"""
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, g
 from functools import wraps
 import logging
 from typing import Dict, Any, Optional
+from pydantic import ValidationError
 
 from ...services.auth_service import AuthService
-from ...utils.validation_utils import ValidationUtils
 from ...utils.logging_utils import LoggingUtils
-from ...utils.decorators import require_auth, require_roles
+from ...utils.auth_decorators import require_auth
+from ...utils.input_validation import (
+    validate_json, ValidationError as InputValidationError
+)
+from ...utils.exceptions import (
+    ValidationError as APIValidationError,
+    AuthenticationError,
+    ResourceNotFoundError
+)
+from ...utils.error_handler import (
+    raise_validation_error,
+    raise_authentication_error,
+    raise_not_found
+)
+from ...utils.rate_limiter import get_rate_limit_decorators
+from ...models.request_models import (
+    UserRegistrationRequest, UserLoginRequest, PasswordResetRequest,
+    PasswordResetConfirmRequest, ChangePasswordRequest, RefreshTokenRequest,
+    EmailVerificationRequest, ForgotPasswordRequest, UserProfileUpdateRequest
+)
 
 # Create blueprint
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
@@ -26,23 +45,113 @@ def init_auth_routes(auth_svc: AuthService) -> None:
     """
     global auth_service
     auth_service = auth_svc
+    
+    # Apply rate limiting to auth endpoints
+    # _apply_rate_limiting_to_auth_routes()  # Temporarily disabled to fix endpoint conflicts
 
 
-def require_json(f):
-    """Decorator to require JSON content type"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not request.is_json:
-            return jsonify({
-                'success': False,
-                'error': 'Content-Type must be application/json'
-            }), 400
-        return f(*args, **kwargs)
-    return decorated_function
+def _apply_rate_limiting_to_auth_routes() -> None:
+    """Apply rate limiting decorators to authentication routes"""
+    try:
+        from flask import current_app
+        decorators = get_rate_limit_decorators(current_app)
+        
+        if not decorators:
+            logger.warning("Rate limiting decorators not available for auth routes")
+            return
+        
+        # Apply auth endpoint rate limiting (10 requests per minute)
+        auth_endpoints = [
+            'auth.register',
+            'auth.login', 
+            'auth.forgot_password',
+            'auth.reset_password',
+            'auth.verify_email',
+            'auth.resend_verification'
+        ]
+        
+        # Apply rate limiting to auth endpoints
+        for endpoint in auth_endpoints:
+            try:
+                # Get the view function
+                view_func = current_app.view_functions.get(endpoint)
+                if view_func:
+                    # Apply the auth endpoints rate limiter
+                    limited_func = decorators.auth_endpoints(view_func)
+                    current_app.view_functions[endpoint] = limited_func
+                    logger.debug(f"Applied auth rate limiting to {endpoint}")
+            except Exception as e:
+                logger.warning(f"Failed to apply rate limiting to {endpoint}: {e}")
+        
+        # Apply stricter rate limiting to sensitive endpoints
+        sensitive_endpoints = [
+            'auth.change_password',
+            'auth.delete_account'
+        ]
+        
+        for endpoint in sensitive_endpoints:
+            try:
+                view_func = current_app.view_functions.get(endpoint)
+                if view_func:
+                    # Apply stricter rate limiting (5 requests per minute)
+                    limited_func = decorators.custom_limit('5/minute')(view_func)
+                    current_app.view_functions[endpoint] = limited_func
+                    logger.debug(f"Applied strict rate limiting to {endpoint}")
+            except Exception as e:
+                logger.warning(f"Failed to apply strict rate limiting to {endpoint}: {e}")
+        
+        # Apply standard API rate limiting to other endpoints
+        standard_endpoints = [
+            'auth.refresh_token',
+            'auth.profile',
+            'auth.update_profile',
+            'auth.logout'
+        ]
+        
+        for endpoint in standard_endpoints:
+            try:
+                view_func = current_app.view_functions.get(endpoint)
+                if view_func:
+                    # Apply standard API rate limiting
+                    limited_func = decorators.api_standard(view_func)
+                    current_app.view_functions[endpoint] = limited_func
+                    logger.debug(f"Applied standard rate limiting to {endpoint}")
+            except Exception as e:
+                logger.warning(f"Failed to apply standard rate limiting to {endpoint}: {e}")
+        
+        logger.info("Rate limiting applied to auth routes successfully")
+        
+    except Exception as e:
+        logger.error(f"Failed to apply rate limiting to auth routes: {e}")
+        # Don't fail the initialization if rate limiting setup fails
+        pass
+
+
+def handle_validation_error(error: Exception) -> None:
+    """Handle validation errors using centralized error handling"""
+    if isinstance(error, ValidationError):
+        # Convert Pydantic validation error to our API validation error
+        details = {}
+        for err in error.errors():
+            field = '.'.join(str(loc) for loc in err['loc'])
+            details[field] = err['msg']
+        raise_validation_error(
+            "Request validation failed",
+            details=details
+        )
+    elif isinstance(error, InputValidationError):
+        raise_validation_error(
+            error.message,
+            field=getattr(error, 'field', None),
+            details=getattr(error, 'details', None)
+        )
+    else:
+        # Re-raise other exceptions to be handled by the centralized handler
+        raise error
 
 
 @auth_bp.route('/register', methods=['POST'])
-@require_json
+@validate_json(pydantic_model=UserRegistrationRequest)
 def register() -> tuple:
     """Register a new user
     
@@ -50,46 +159,20 @@ def register() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = ['email', 'password', 'first_name', 'last_name']
-        validation_errors = ValidationUtils.validate_required_fields(data, required_fields)
-        
-        if validation_errors:
-            return jsonify({
-                'success': False,
-                'error': 'Validation failed',
-                'details': validation_errors
-            }), 400
-        
-        # Validate email format
-        if not ValidationUtils.validate_email(data['email']):
-            return jsonify({
-                'success': False,
-                'error': 'Invalid email format'
-            }), 400
-        
-        # Validate password strength
-        password_errors = ValidationUtils.validate_password(data['password'])
-        if password_errors:
-            return jsonify({
-                'success': False,
-                'error': 'Password validation failed',
-                'details': password_errors
-            }), 400
+        # Get validated data from request (it's a dict after validation)
+        validated_data: dict = request.validated_data
         
         # Register user
         result = auth_service.register_user(
-            email=data['email'],
-            password=data['password'],
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            role=data.get('role', 'user')
+            email=validated_data['email'],
+            password=validated_data['password'],
+            first_name=validated_data.get('first_name'),
+            last_name=validated_data.get('last_name'),
+            role=validated_data.get('role', 'user')
         )
         
         if result['success']:
-            logger.info(f"User registered successfully: {data['email']}")
+            logger.info(f"User registered successfully: {validated_data['email']}")
             return jsonify({
                 'success': True,
                 'message': 'User registered successfully',
@@ -101,6 +184,8 @@ def register() -> tuple:
                 'error': result['error']
             }), 400
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Registration error: {str(e)}")
         return jsonify({
@@ -110,7 +195,7 @@ def register() -> tuple:
 
 
 @auth_bp.route('/login', methods=['POST'])
-@require_json
+@validate_json(pydantic_model=UserLoginRequest)
 def login() -> tuple:
     """User login
     
@@ -118,42 +203,34 @@ def login() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = ['email', 'password']
-        validation_errors = ValidationUtils.validate_required_fields(data, required_fields)
-        
-        if validation_errors:
-            return jsonify({
-                'success': False,
-                'error': 'Email and password are required'
-            }), 400
+        # Get validated data from request
+        validated_data: UserLoginRequest = request.validated_data
         
         # Attempt login
         result = auth_service.login_user(
-            email=data['email'],
-            password=data['password'],
+            email=validated_data['email'],
+            password=validated_data['password'],
             ip_address=request.remote_addr,
             user_agent=request.headers.get('User-Agent', '')
         )
         
         if result['success']:
-            logger.info(f"User logged in successfully: {data['email']}")
+            logger.info(f"User logged in successfully: {validated_data['email']}")
             return jsonify({
-                'success': True,
-                'message': 'Login successful',
-                'access_token': result['access_token'],
-                'refresh_token': result['refresh_token'],
-                'user': result['user']
+                'user': result['user'],
+                'token': result['access_token'],
+                'refreshToken': result['refresh_token'],
+                'expiresIn': 3600
             }), 200
         else:
-            logger.warning(f"Login failed for {data['email']}: {result['error']}")
+            logger.warning(f"Login failed for {validated_data['email']}: {result['error']}")
             return jsonify({
                 'success': False,
                 'error': result['error']
             }), 401
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Login error: {str(e)}")
         return jsonify({
@@ -163,7 +240,7 @@ def login() -> tuple:
 
 
 @auth_bp.route('/refresh', methods=['POST'])
-@require_json
+@validate_json(pydantic_model=RefreshTokenRequest)
 def refresh_token() -> tuple:
     """Refresh access token
     
@@ -171,21 +248,17 @@ def refresh_token() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        data = request.get_json()
-        
-        if 'refresh_token' not in data:
-            return jsonify({
-                'success': False,
-                'error': 'Refresh token is required'
-            }), 400
+        # Get validated data from request
+        validated_data: RefreshTokenRequest = request.validated_data
         
         # Refresh token
-        result = auth_service.refresh_access_token(data['refresh_token'])
+        result = auth_service.refresh_access_token(validated_data['refresh_token'])
         
         if result['success']:
             return jsonify({
-                'success': True,
-                'access_token': result['access_token']
+                'user': result.get('user'),
+                'token': result['access_token'],
+                'expiresIn': 3600
             }), 200
         else:
             return jsonify({
@@ -193,6 +266,8 @@ def refresh_token() -> tuple:
                 'error': result['error']
             }), 401
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Token refresh error: {str(e)}")
         return jsonify({
@@ -243,7 +318,7 @@ def logout() -> tuple:
 
 
 @auth_bp.route('/profile', methods=['GET'])
-@require_auth
+@require_auth()
 def get_profile() -> tuple:
     """Get user profile
     
@@ -251,16 +326,25 @@ def get_profile() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
+        user_id = g.current_user  # This is the user ID string from JWT
+        
+        # Fetch full user data from database using auth service
+        user = auth_service.db_service.get_user(user_id)
+        
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
         
         return jsonify({
             'success': True,
             'user': {
-                'id': str(user['_id']),
+                'id': user['id'],
                 'email': user['email'],
                 'first_name': user['first_name'],
                 'last_name': user['last_name'],
-                'role': user['role'],
+                'role': user.get('roles', ['user'])[0] if user.get('roles') else 'user',
                 'created_at': user['created_at'].isoformat(),
                 'last_login': user.get('last_login', {}).get('timestamp', '').isoformat() if user.get('last_login', {}).get('timestamp') else None
             }
@@ -275,8 +359,8 @@ def get_profile() -> tuple:
 
 
 @auth_bp.route('/profile', methods=['PUT'])
-@require_auth
-@require_json
+@require_auth()
+@validate_json(pydantic_model=UserProfileUpdateRequest)
 def update_profile() -> tuple:
     """Update user profile
     
@@ -284,12 +368,11 @@ def update_profile() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
-        data = request.get_json()
+        user = g.current_user
+        validated_data: UserProfileUpdateRequest = request.validated_data
         
-        # Validate updatable fields
-        allowed_fields = ['first_name', 'last_name']
-        update_data = {k: v for k, v in data.items() if k in allowed_fields}
+        # Convert to dict for service call
+        update_data = validated_data
         
         if not update_data:
             return jsonify({
@@ -312,6 +395,8 @@ def update_profile() -> tuple:
                 'error': result['error']
             }), 400
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Update profile error: {str(e)}")
         return jsonify({
@@ -321,8 +406,8 @@ def update_profile() -> tuple:
 
 
 @auth_bp.route('/change-password', methods=['POST'])
-@require_auth
-@require_json
+@require_auth()
+@validate_json(pydantic_model=ChangePasswordRequest)
 def change_password() -> tuple:
     """Change user password
     
@@ -330,33 +415,14 @@ def change_password() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = ['current_password', 'new_password']
-        validation_errors = ValidationUtils.validate_required_fields(data, required_fields)
-        
-        if validation_errors:
-            return jsonify({
-                'success': False,
-                'error': 'Current password and new password are required'
-            }), 400
-        
-        # Validate new password strength
-        password_errors = ValidationUtils.validate_password(data['new_password'])
-        if password_errors:
-            return jsonify({
-                'success': False,
-                'error': 'New password validation failed',
-                'details': password_errors
-            }), 400
+        user = g.current_user
+        validated_data: ChangePasswordRequest = request.validated_data
         
         # Change password
         result = auth_service.change_password(
             str(user['_id']),
-            data['current_password'],
-            data['new_password']
+            validated_data['current_password'],
+            validated_data['new_password']
         )
         
         if result['success']:
@@ -371,6 +437,8 @@ def change_password() -> tuple:
                 'error': result['error']
             }), 400
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Change password error: {str(e)}")
         return jsonify({
@@ -380,7 +448,7 @@ def change_password() -> tuple:
 
 
 @auth_bp.route('/forgot-password', methods=['POST'])
-@require_json
+@validate_json(pydantic_model=ForgotPasswordRequest)
 def forgot_password() -> tuple:
     """Request password reset
     
@@ -388,31 +456,20 @@ def forgot_password() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        data = request.get_json()
-        
-        if 'email' not in data:
-            return jsonify({
-                'success': False,
-                'error': 'Email is required'
-            }), 400
-        
-        # Validate email format
-        if not ValidationUtils.validate_email(data['email']):
-            return jsonify({
-                'success': False,
-                'error': 'Invalid email format'
-            }), 400
+        validated_data: ForgotPasswordRequest = request.validated_data
         
         # Request password reset
-        result = auth_service.request_password_reset(data['email'])
+        result = auth_service.request_password_reset(validated_data['email'])
         
         # Always return success to prevent email enumeration
-        logger.info(f"Password reset requested for: {data['email']}")
+        logger.info(f"Password reset requested for: {validated_data['email']}")
         return jsonify({
             'success': True,
             'message': 'If the email exists, a password reset link has been sent'
         }), 200
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Forgot password error: {str(e)}")
         return jsonify({
@@ -422,7 +479,7 @@ def forgot_password() -> tuple:
 
 
 @auth_bp.route('/reset-password', methods=['POST'])
-@require_json
+@validate_json(pydantic_model=PasswordResetConfirmRequest)
 def reset_password() -> tuple:
     """Reset password with token
     
@@ -430,29 +487,10 @@ def reset_password() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = ['token', 'new_password']
-        validation_errors = ValidationUtils.validate_required_fields(data, required_fields)
-        
-        if validation_errors:
-            return jsonify({
-                'success': False,
-                'error': 'Token and new password are required'
-            }), 400
-        
-        # Validate new password strength
-        password_errors = ValidationUtils.validate_password(data['new_password'])
-        if password_errors:
-            return jsonify({
-                'success': False,
-                'error': 'New password validation failed',
-                'details': password_errors
-            }), 400
+        validated_data: PasswordResetConfirmRequest = request.validated_data
         
         # Reset password
-        result = auth_service.reset_password(data['token'], data['new_password'])
+        result = auth_service.reset_password(validated_data['token'], validated_data['new_password'])
         
         if result['success']:
             logger.info("Password reset completed successfully")
@@ -466,6 +504,8 @@ def reset_password() -> tuple:
                 'error': result['error']
             }), 400
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Reset password error: {str(e)}")
         return jsonify({
@@ -475,7 +515,7 @@ def reset_password() -> tuple:
 
 
 @auth_bp.route('/verify-email', methods=['POST'])
-@require_json
+@validate_json(pydantic_model=EmailVerificationRequest)
 def verify_email() -> tuple:
     """Verify email address
     
@@ -483,16 +523,10 @@ def verify_email() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        data = request.get_json()
-        
-        if 'token' not in data:
-            return jsonify({
-                'success': False,
-                'error': 'Verification token is required'
-            }), 400
+        validated_data: EmailVerificationRequest = request.validated_data
         
         # Verify email
-        result = auth_service.verify_email(data['token'])
+        result = auth_service.verify_email(validated_data['token'])
         
         if result['success']:
             logger.info("Email verified successfully")
@@ -506,6 +540,8 @@ def verify_email() -> tuple:
                 'error': result['error']
             }), 400
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Email verification error: {str(e)}")
         return jsonify({
@@ -515,7 +551,7 @@ def verify_email() -> tuple:
 
 
 @auth_bp.route('/sessions', methods=['GET'])
-@require_auth
+@require_auth()
 def get_sessions() -> tuple:
     """Get user sessions
     
@@ -523,7 +559,7 @@ def get_sessions() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
+        user = g.current_user
         
         # Get user sessions
         result = auth_service.get_user_sessions(str(user['_id']))
@@ -548,7 +584,7 @@ def get_sessions() -> tuple:
 
 
 @auth_bp.route('/sessions/<session_id>', methods=['DELETE'])
-@require_auth
+@require_auth()
 def revoke_session(session_id: str) -> tuple:
     """Revoke a specific session
     
@@ -559,7 +595,7 @@ def revoke_session(session_id: str) -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
+        user = g.current_user
         
         # Revoke session
         result = auth_service.revoke_session(str(user['_id']), session_id)

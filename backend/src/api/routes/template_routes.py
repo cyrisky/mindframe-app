@@ -1,15 +1,26 @@
 """Template routes for the mindframe application"""
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, g
 from functools import wraps
 import logging
 from typing import Dict, Any, Optional
+from pydantic import ValidationError
 
 from ...services.auth_service import AuthService
 from ...utils.decorators import require_auth, require_roles
 from ...services.template_service import TemplateService
-from ...utils.validation_utils import ValidationUtils
+
 from ...utils.logging_utils import LoggingUtils
+from ...utils.error_handler import raise_validation_error, raise_authentication_error, raise_not_found
+from ...utils.input_validation import (
+    validate_json, validate_query_params,
+    ValidationError as InputValidationError
+)
+from ...models.request_models import (
+    TemplateCreateRequest, TemplateUpdateRequest, PaginationParams,
+    SortParams, FilterParams, TemplateListParams, TemplateRenderRequest,
+    TemplatePreviewRequest, TemplateValidationRequest, TemplateDuplicateRequest
+)
 
 # Create blueprint
 template_bp = Blueprint('template', __name__, url_prefix='/api/templates')
@@ -32,21 +43,31 @@ def init_template_routes(auth_svc: AuthService, template_svc: TemplateService) -
     template_service = template_svc
 
 
-def require_json(f):
-    """Decorator to require JSON content type"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not request.is_json:
-            return jsonify({
-                'success': False,
-                'error': 'Content-Type must be application/json'
-            }), 400
-        return f(*args, **kwargs)
-    return decorated_function
+def handle_validation_error(error: Exception) -> tuple:
+    """Handle validation errors consistently"""
+    if isinstance(error, ValidationError):
+        return jsonify({
+            'success': False,
+            'error': 'Validation failed',
+            'details': error.errors()
+        }), 400
+    elif isinstance(error, InputValidationError):
+        return jsonify({
+            'success': False,
+            'error': 'Validation failed',
+            'details': str(error)
+        }), 400
+    else:
+        logger.error(f"Unexpected validation error: {str(error)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error'
+        }), 500
 
 
 @template_bp.route('', methods=['GET'])
-@require_auth
+@require_auth()
+@validate_query_params(TemplateListParams)
 def list_templates() -> tuple:
     """List templates with optional filtering
     
@@ -54,30 +75,23 @@ def list_templates() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        # Get query parameters
-        page = int(request.args.get('page', 1))
-        limit = int(request.args.get('limit', 20))
-        category = request.args.get('category')
-        search = request.args.get('search')
-        
-        # Validate pagination parameters
-        if page < 1:
-            page = 1
-        if limit < 1 or limit > 100:
-            limit = 20
+        # Get validated query parameters
+        params = request.validated_params
         
         # Build filters
         filters = {}
-        if category:
-            filters['category'] = category
-        if search:
-            filters['search'] = search
+        if params.category:
+            filters['category'] = params.category.value
+        if params.search:
+            filters['search'] = params.search
         
         # Get templates
         result = template_service.list_templates(
-            page=page,
-            limit=limit,
-            filters=filters
+            page=params.page,
+            limit=params.limit,
+            filters=filters,
+            sort_by=params.sort_by,
+            sort_order=params.sort_order
         )
         
         if result['success']:
@@ -92,6 +106,8 @@ def list_templates() -> tuple:
                 'error': result['error']
             }), 400
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"List templates error: {str(e)}")
         return jsonify({
@@ -101,8 +117,9 @@ def list_templates() -> tuple:
 
 
 @template_bp.route('', methods=['POST'])
-@require_auth
-@require_json
+@require_auth()
+@validate_json()
+@validate_json(pydantic_model=TemplateCreateRequest)
 def create_template() -> tuple:
     """Create a new template
     
@@ -110,43 +127,25 @@ def create_template() -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = ['name', 'content', 'category']
-        validation_errors = ValidationUtils.validate_required_fields(data, required_fields)
-        
-        if validation_errors:
-            return jsonify({
-                'success': False,
-                'error': 'Validation failed',
-                'details': validation_errors
-            }), 400
-        
-        # Validate template name
-        if not ValidationUtils.validate_string_length(data['name'], min_length=1, max_length=100):
-            return jsonify({
-                'success': False,
-                'error': 'Template name must be between 1 and 100 characters'
-            }), 400
+        user = g.current_user
+        validated_data = request.validated_data
         
         # Create template
         template_data = {
-            'name': data['name'],
-            'description': data.get('description', ''),
-            'content': data['content'],
-            'category': data['category'],
-            'variables': data.get('variables', []),
-            'tags': data.get('tags', []),
-            'is_public': data.get('is_public', False),
+            'name': validated_data['name'],
+            'description': validated_data['description'],
+            'content': validated_data['content'],
+            'category': validated_data['category'],
+            'variables': validated_data['variables'],
+            'tags': validated_data['tags'],
+            'is_public': validated_data['is_public'],
             'created_by': str(user['_id'])
         }
         
         result = template_service.create_template(template_data)
         
         if result['success']:
-            logger.info(f"Template created: {data['name']} by {user['email']}")
+            logger.info(f"Template created: {validated_data['name']} by {user['email']}")
             return jsonify({
                 'success': True,
                 'message': 'Template created successfully',
@@ -158,6 +157,8 @@ def create_template() -> tuple:
                 'error': result['error']
             }), 400
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Create template error: {str(e)}")
         return jsonify({
@@ -167,7 +168,7 @@ def create_template() -> tuple:
 
 
 @template_bp.route('/<template_id>', methods=['GET'])
-@require_auth
+@require_auth()
 def get_template(template_id: str) -> tuple:
     """Get a specific template
     
@@ -178,7 +179,7 @@ def get_template(template_id: str) -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
+        user = g.current_user
         
         # Get template
         result = template_service.get_template(template_id, str(user['_id']))
@@ -203,8 +204,9 @@ def get_template(template_id: str) -> tuple:
 
 
 @template_bp.route('/<template_id>', methods=['PUT'])
-@require_auth
-@require_json
+@require_auth()
+@validate_json()  # 50KB limit for templates
+@validate_json(pydantic_model=TemplateUpdateRequest)
 def update_template(template_id: str) -> tuple:
     """Update a template
     
@@ -215,24 +217,30 @@ def update_template(template_id: str) -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
-        data = request.get_json()
+        user = g.current_user
+        validated_data = request.validated_data
         
-        # Validate updatable fields
-        allowed_fields = ['name', 'description', 'content', 'category', 'variables', 'tags', 'is_public']
-        update_data = {k: v for k, v in data.items() if k in allowed_fields}
+        # Build update data from validated fields
+        update_data = {}
+        if validated_data.get('name') is not None:
+            update_data['name'] = validated_data['name']
+        if validated_data.get('description') is not None:
+            update_data['description'] = validated_data['description']
+        if validated_data.get('content') is not None:
+            update_data['content'] = validated_data['content']
+        if validated_data.get('category') is not None:
+            update_data['category'] = validated_data['category']
+        if validated_data.get('variables') is not None:
+            update_data['variables'] = validated_data['variables']
+        if validated_data.get('tags') is not None:
+            update_data['tags'] = validated_data['tags']
+        if validated_data.get('is_public') is not None:
+            update_data['is_public'] = validated_data['is_public']
         
         if not update_data:
             return jsonify({
                 'success': False,
                 'error': 'No valid fields to update'
-            }), 400
-        
-        # Validate template name if provided
-        if 'name' in update_data and not ValidationUtils.validate_string_length(update_data['name'], min_length=1, max_length=100):
-            return jsonify({
-                'success': False,
-                'error': 'Template name must be between 1 and 100 characters'
             }), 400
         
         # Update template
@@ -250,6 +258,8 @@ def update_template(template_id: str) -> tuple:
                 'error': result['error']
             }), 404 if 'not found' in result['error'].lower() else 400
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Update template error: {str(e)}")
         return jsonify({
@@ -259,7 +269,7 @@ def update_template(template_id: str) -> tuple:
 
 
 @template_bp.route('/<template_id>', methods=['DELETE'])
-@require_auth
+@require_auth()
 def delete_template(template_id: str) -> tuple:
     """Delete a template
     
@@ -270,7 +280,7 @@ def delete_template(template_id: str) -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
+        user = g.current_user
         
         # Delete template
         result = template_service.delete_template(template_id, str(user['_id']))
@@ -296,8 +306,9 @@ def delete_template(template_id: str) -> tuple:
 
 
 @template_bp.route('/<template_id>/render', methods=['POST'])
-@require_auth
-@require_json
+@require_auth()
+@validate_json()
+@validate_json(pydantic_model=TemplateRenderRequest)
 def render_template(template_id: str) -> tuple:
     """Render a template with provided data
     
@@ -308,14 +319,11 @@ def render_template(template_id: str) -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
-        data = request.get_json()
-        
-        # Get template variables
-        variables = data.get('variables', {})
+        user = g.current_user
+        validated_data = request.validated_data
         
         # Render template
-        result = template_service.render_template(template_id, variables, str(user['_id']))
+        result = template_service.render_template(template_id, validated_data.variables, str(user['_id']))
         
         if result['success']:
             return jsonify({
@@ -328,6 +336,8 @@ def render_template(template_id: str) -> tuple:
                 'error': result['error']
             }), 404 if 'not found' in result['error'].lower() else 400
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Render template error: {str(e)}")
         return jsonify({
@@ -337,8 +347,8 @@ def render_template(template_id: str) -> tuple:
 
 
 @template_bp.route('/<template_id>/preview', methods=['POST'])
-@require_auth
-@require_json
+@require_auth()
+@validate_json(pydantic_model=TemplatePreviewRequest)
 def preview_template(template_id: str) -> tuple:
     """Preview a template with sample data
     
@@ -349,11 +359,11 @@ def preview_template(template_id: str) -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
-        data = request.get_json()
+        user = g.current_user
+        validated_data = request.validated_data
         
         # Get custom sample data if provided
-        sample_data = data.get('sample_data')
+        sample_data = validated_data.sample_data
         
         # Preview template
         result = template_service.preview_template(template_id, str(user['_id']), sample_data)
@@ -370,6 +380,12 @@ def preview_template(template_id: str) -> tuple:
                 'error': result['error']
             }), 404 if 'not found' in result['error'].lower() else 400
     
+    except (ValidationError, InputValidationError) as e:
+        logger.warning(f"Preview template validation error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Validation error: {str(e)}'
+        }), 400
     except Exception as e:
         logger.error(f"Preview template error: {str(e)}")
         return jsonify({
@@ -379,7 +395,7 @@ def preview_template(template_id: str) -> tuple:
 
 
 @template_bp.route('/<template_id>/variables', methods=['GET'])
-@require_auth
+@require_auth()
 def get_template_variables(template_id: str) -> tuple:
     """Get template variable definitions
     
@@ -390,7 +406,7 @@ def get_template_variables(template_id: str) -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
+        user = g.current_user
         
         # Get template variables
         result = template_service.get_template_variables(template_id, str(user['_id']))
@@ -415,8 +431,9 @@ def get_template_variables(template_id: str) -> tuple:
 
 
 @template_bp.route('/<template_id>/validate', methods=['POST'])
-@require_auth
-@require_json
+@require_auth()
+@validate_json()
+@validate_json(pydantic_model=TemplateValidationRequest)
 def validate_template_data(template_id: str) -> tuple:
     """Validate data against template requirements
     
@@ -427,11 +444,11 @@ def validate_template_data(template_id: str) -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
-        data = request.get_json()
+        user = g.current_user
+        validated_data = request.validated_data
         
         # Get template data to validate
-        template_data = data.get('data', {})
+        template_data = validated_data.data
         
         # Validate template data
         result = template_service.validate_template_data(template_id, template_data, str(user['_id']))
@@ -448,6 +465,12 @@ def validate_template_data(template_id: str) -> tuple:
                 'error': result['error']
             }), 404 if 'not found' in result['error'].lower() else 400
     
+    except (ValidationError, InputValidationError) as e:
+        logger.warning(f"Validate template data validation error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Validation error: {str(e)}'
+        }), 400
     except Exception as e:
         logger.error(f"Validate template data error: {str(e)}")
         return jsonify({
@@ -457,7 +480,7 @@ def validate_template_data(template_id: str) -> tuple:
 
 
 @template_bp.route('/categories', methods=['GET'])
-@require_auth
+@require_auth()
 def get_template_categories() -> tuple:
     """Get available template categories
     
@@ -488,7 +511,7 @@ def get_template_categories() -> tuple:
 
 
 @template_bp.route('/stats', methods=['GET'])
-@require_auth
+@require_auth()
 @require_roles(['admin', 'manager'])
 def get_template_stats() -> tuple:
     """Get template usage statistics
@@ -520,8 +543,9 @@ def get_template_stats() -> tuple:
 
 
 @template_bp.route('/<template_id>/duplicate', methods=['POST'])
-@require_auth
-@require_json
+@require_auth()
+@validate_json()
+@validate_json(pydantic_model=TemplateDuplicateRequest)
 def duplicate_template(template_id: str) -> tuple:
     """Duplicate a template
     
@@ -532,23 +556,8 @@ def duplicate_template(template_id: str) -> tuple:
         tuple: JSON response and status code
     """
     try:
-        user = request.current_user
-        data = request.get_json()
-        
-        # Get new template name
-        new_name = data.get('name')
-        if not new_name:
-            return jsonify({
-                'success': False,
-                'error': 'New template name is required'
-            }), 400
-        
-        # Validate template name
-        if not ValidationUtils.validate_string_length(new_name, min_length=1, max_length=100):
-            return jsonify({
-                'success': False,
-                'error': 'Template name must be between 1 and 100 characters'
-            }), 400
+        user = g.current_user
+        validated_data = request.validated_data
         
         # Get original template
         template_result = template_service.get_template(template_id, str(user['_id']))
@@ -562,8 +571,8 @@ def duplicate_template(template_id: str) -> tuple:
         # Create duplicate template
         original_template = template_result['template']
         duplicate_data = {
-            'name': new_name,
-            'description': f"Copy of {original_template['name']}",
+            'name': validated_data.name,
+            'description': validated_data.description or f"Copy of {original_template['name']}",
             'content': original_template['content'],
             'category': original_template['category'],
             'variables': original_template.get('variables', []),
@@ -587,6 +596,8 @@ def duplicate_template(template_id: str) -> tuple:
                 'error': result['error']
             }), 400
     
+    except (ValidationError, InputValidationError) as e:
+        return handle_validation_error(e)
     except Exception as e:
         logger.error(f"Duplicate template error: {str(e)}")
         return jsonify({

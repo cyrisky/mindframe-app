@@ -55,11 +55,15 @@ const createApiClient = (): AxiosInstance => {
         originalRequest._retry = true;
 
         try {
+          // Get refresh token from localStorage
+          const refreshToken = localStorage.getItem('refreshToken');
+          if (!refreshToken) {
+            throw new Error('No refresh token available');
+          }
+          
           // Try to refresh token
-          const refreshResponse = await axios.post(`${baseURL}/api/auth/refresh`, {}, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+          const refreshResponse = await axios.post(`${baseURL}/api/auth/refresh`, {
+            refresh_token: refreshToken
           });
 
           const newToken = refreshResponse.data.token;
@@ -73,6 +77,7 @@ const createApiClient = (): AxiosInstance => {
         } catch (refreshError) {
           // Refresh failed, redirect to login
           localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
           window.location.href = '/login';
           return Promise.reject(refreshError);
         }

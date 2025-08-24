@@ -30,10 +30,12 @@ class TemplateService:
                    template_dirs: List[str] = None) -> bool:
         """Initialize template service"""
         try:
-            # Initialize template processor
-            self.template_processor = TemplateProcessor()
-            if not self.template_processor.initialize(template_dirs):
-                raise Exception("Failed to initialize template processor")
+            # Initialize template processor with the first template directory
+            template_dir = None
+            if template_dirs and len(template_dirs) > 0:
+                template_dir = template_dirs[0]
+            
+            self.template_processor = TemplateProcessor(template_dir)
             
             # Set service dependencies
             self.db_service = db_service
@@ -182,32 +184,77 @@ class TemplateService:
             logger.error(f"Error getting template: {e}")
             return None
     
-    def list_templates(self, user_id: str = None, category: str = None,
-                      status: str = "active", limit: int = 50, 
-                      skip: int = 0) -> List[Dict[str, Any]]:
-        """List templates with filtering"""
-        if not self.db_service:
-            return []
-        
+    def list_templates(self, page: int = 1, limit: int = 50, 
+                      filters: Dict[str, Any] = None, sort_by: str = "updated_at",
+                      sort_order: str = "desc") -> Dict[str, Any]:
+        """List templates with filtering and pagination"""
         try:
-            query = {"status": status}
+            # Calculate skip based on page
+            skip = (page - 1) * limit
             
-            if user_id:
-                query["author_id"] = user_id
+            # Build query from filters
+            query = {"status": "active"}  # Default to active templates
             
-            if category:
-                query["category"] = category
+            if filters:
+                if "category" in filters:
+                    query["category"] = filters["category"]
+                if "search" in filters:
+                    # Simple text search in name and description
+                    query["$or"] = [
+                        {"name": {"$regex": filters["search"], "$options": "i"}},
+                        {"description": {"$regex": filters["search"], "$options": "i"}}
+                    ]
             
-            templates = self.db_service.find(
-                "templates", query, limit=limit, skip=skip,
-                sort=[("updated_at", -1)]
-            )
+            # Handle sort order
+            sort_direction = -1 if sort_order == "desc" else 1
+            sort_field = sort_by if sort_by else "updated_at"
             
-            return list(templates)
+            # Get total count for pagination
+            total_count = 0
+            if self.db_service:
+                total_count = self.db_service.count_documents("templates", query)
+            
+            # Get templates
+            templates = []
+            if self.db_service:
+                templates = self.db_service.find_many(
+                    "templates", query, limit=limit, skip=skip,
+                    sort=[(sort_field, sort_direction)]
+                )
+            
+            # Calculate pagination info
+            total_pages = (total_count + limit - 1) // limit
+            has_next = page < total_pages
+            has_prev = page > 1
+            
+            return {
+                "success": True,
+                "templates": templates,
+                "pagination": {
+                    "page": page,
+                    "limit": limit,
+                    "total": total_count,
+                    "total_pages": total_pages,
+                    "has_next": has_next,
+                    "has_prev": has_prev
+                }
+            }
             
         except Exception as e:
-            logger.error(f"Error listing templates: {e}")
-            return []
+            logger.error(f"Error listing templates: {str(e)}")
+            return {
+                "success": False,
+                "error": f"Failed to list templates: {str(e)}",
+                "templates": [],
+                "pagination": {
+                    "page": page,
+                    "limit": limit,
+                    "total": 0,
+                    "total_pages": 0,
+                    "has_next": False,
+                    "has_prev": False
+                }
+            }
     
     def update_template(self, template_id: str, update_data: Dict[str, Any],
                        user_id: str = None) -> Dict[str, Any]:

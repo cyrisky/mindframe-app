@@ -1,6 +1,7 @@
 """Database service for MongoDB operations"""
 
 import os
+import time
 from typing import Optional, Dict, Any, List
 from pymongo import MongoClient
 from pymongo.database import Database
@@ -9,7 +10,9 @@ from pymongo.errors import ConnectionFailure, OperationFailure
 import logging
 from datetime import datetime
 
-logger = logging.getLogger(__name__)
+from ..utils.logging_utils import LoggingUtils
+
+logger = LoggingUtils.get_logger(__name__)
 
 
 class DatabaseService:
@@ -24,18 +27,28 @@ class DatabaseService:
     
     def initialize(self, connection_string: str = None, database_name: str = None) -> bool:
         """Initialize database connection"""
+        start_time = time.time()
+        
+        # Create logger for initialization
+        context_logger = LoggingUtils.get_logger('database_service.init')
+        
+        context_logger.info("Starting database initialization", extra={
+            'operation': 'initialize_database',
+            'database_name': database_name or os.getenv('MONGODB_DB', 'mindframe_app')
+        })
+        
         try:
             # Use provided parameters or environment variables
             self._connection_string = connection_string or os.getenv(
-                'MONGODB_URI', 
-                'mongodb://localhost:27017'
+                'MONGODB_URI'
             )
             self._database_name = database_name or os.getenv(
-                'MONGODB_DATABASE', 
+                'MONGODB_DB', 
                 'mindframe_app'
             )
             
             # Create MongoDB client
+            client_start = time.time()
             self.client = MongoClient(
                 self._connection_string,
                 serverSelectionTimeoutMS=5000,  # 5 second timeout
@@ -44,26 +57,49 @@ class DatabaseService:
                 maxPoolSize=50,          # Maximum connection pool size
                 retryWrites=True
             )
+            client_time = time.time() - client_start
             
             # Test connection
+            ping_start = time.time()
             self.client.admin.command('ping')
+            ping_time = time.time() - ping_start
             
             # Get database
             self.database = self.client[self._database_name]
             
             # Create indexes
+            index_start = time.time()
             self._create_indexes()
+            index_time = time.time() - index_start
             
             self._is_connected = True
-            logger.info(f"Connected to MongoDB database: {self._database_name}")
+            
+            total_time = time.time() - start_time
+            context_logger.info("Database initialization successful", extra={
+                'database_name': self._database_name,
+                'total_time_ms': round(total_time * 1000, 2),
+                'client_creation_time_ms': round(client_time * 1000, 2),
+                'ping_time_ms': round(ping_time * 1000, 2),
+                'index_creation_time_ms': round(index_time * 1000, 2)
+            })
             return True
             
         except ConnectionFailure as e:
-            logger.error(f"Failed to connect to MongoDB: {e}")
+            context_logger.error("Failed to connect to MongoDB", extra={
+                'error': str(e),
+                'error_type': 'ConnectionFailure',
+                'database_name': self._database_name,
+                'connection_time_ms': round((time.time() - start_time) * 1000, 2)
+            })
             self._is_connected = False
             return False
         except Exception as e:
-            logger.error(f"Unexpected error connecting to MongoDB: {e}")
+            context_logger.error("Unexpected error connecting to MongoDB", extra={
+                'error': str(e),
+                'error_type': type(e).__name__,
+                'database_name': self._database_name,
+                'connection_time_ms': round((time.time() - start_time) * 1000, 2)
+            })
             self._is_connected = False
             return False
     
@@ -89,7 +125,6 @@ class DatabaseService:
             
             # Users indexes
             user_collection = self.get_collection('users')
-            user_collection.create_index('username', unique=True)
             user_collection.create_index('email', unique=True)
             user_collection.create_index('api_key')
             user_collection.create_index('is_active')
@@ -112,7 +147,7 @@ class DatabaseService:
     
     def get_collection(self, collection_name: str) -> Collection:
         """Get a MongoDB collection"""
-        if not self.database:
+        if self.database is None:
             raise RuntimeError("Database not initialized")
         return self.database[collection_name]
     
@@ -253,12 +288,12 @@ class DatabaseService:
     
     def drop_collection(self, collection_name: str):
         """Drop a collection"""
-        if self.database:
+        if self.database is not None:
             self.database.drop_collection(collection_name)
     
     def list_collections(self) -> List[str]:
         """List all collections in the database"""
-        if not self.database:
+        if self.database is None:
             return []
         return self.database.list_collection_names()
     
@@ -302,6 +337,119 @@ class DatabaseService:
         
         logger.info(f"Restored {len(documents)} documents to {collection_name} from {backup_path}")
     
+    # User-specific methods
+    def get_user(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """Get user by ID"""
+        try:
+            from bson import ObjectId
+            user_doc = self.find_one('users', {'_id': ObjectId(user_id)})
+            if user_doc:
+                # Convert _id to id for consistency
+                user_doc['id'] = str(user_doc['_id'])
+                del user_doc['_id']
+            return user_doc
+        except Exception as e:
+            logger.error(f"Error getting user by ID {user_id}: {e}")
+            return None
+    
+    def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
+        """Get user by email"""
+        try:
+            user_doc = self.find_one('users', {'email': email})
+            if user_doc:
+                # Convert _id to id for consistency
+                user_doc['id'] = str(user_doc['_id'])
+                del user_doc['_id']
+            return user_doc
+        except Exception as e:
+            logger.error(f"Error getting user by email {email}: {e}")
+            return None
+    
+    def create_user(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new user"""
+        try:
+            # Add timestamps
+            user_data['created_at'] = datetime.utcnow()
+            user_data['updated_at'] = datetime.utcnow()
+            
+            # Insert user
+            user_id = self.insert_one('users', user_data)
+            
+            # Return user data with ID
+            result = user_data.copy()
+            result['id'] = user_id
+            return result
+        except Exception as e:
+            logger.error(f"Error creating user: {e}")
+            raise
+    
+    def update_user(self, user_id: str, update_data: Dict[str, Any]) -> bool:
+        """Update user by ID"""
+        try:
+            from bson import ObjectId
+            # Add updated timestamp
+            update_data['updated_at'] = datetime.utcnow()
+            
+            return self.update_one(
+                'users', 
+                {'_id': ObjectId(user_id)}, 
+                {'$set': update_data}
+            )
+        except Exception as e:
+            logger.error(f"Error updating user {user_id}: {e}")
+            return False
+    
+    def delete_user(self, user_id: str) -> bool:
+        """Delete user by ID"""
+        try:
+            from bson import ObjectId
+            return self.delete_one('users', {'_id': ObjectId(user_id)})
+        except Exception as e:
+            logger.error(f"Error deleting user {user_id}: {e}")
+            return False
+    
+    def get_user_reports(self, user_id: str, limit: int = None) -> List[Dict[str, Any]]:
+        """Get reports for a user"""
+        try:
+            reports = self.find_many(
+                'reports', 
+                {'user_id': user_id},
+                sort=[('created_at', -1)],
+                limit=limit
+            )
+            
+            # Convert _id to id for consistency
+            for report in reports:
+                if '_id' in report:
+                    report['id'] = str(report['_id'])
+                    del report['_id']
+            
+            return reports
+        except Exception as e:
+            logger.error(f"Error getting user reports for {user_id}: {e}")
+            return []
+    
+    def search_users(self, query: Dict[str, Any], limit: int = 10, offset: int = 0) -> List[Dict[str, Any]]:
+        """Search users with query"""
+        try:
+            users = self.find_many(
+                'users',
+                query,
+                limit=limit,
+                skip=offset
+            )
+            
+            # Convert _id to id for consistency
+            for user in users:
+                if '_id' in user:
+                    user['id'] = str(user['_id'])
+                    del user['_id']
+            
+            return users
+        except Exception as e:
+            logger.error(f"Error searching users: {e}")
+            return []
+
     def close(self):
         """Close database connection"""
         if self.client:

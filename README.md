@@ -44,15 +44,51 @@ mindframe-app/
 - **MongoDB Integration**: Data persistence
 - **Redis Queue**: Asynchronous job processing
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
+- Docker and Docker Compose
+- Git
+- **External MongoDB** (MongoDB Atlas, self-hosted, or cloud provider)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd mindframe-app
+   ```
+
+2. **Set up external MongoDB**
+   - See `EXTERNAL_MONGODB_SETUP.md` for detailed setup guide
+   - Get your MongoDB connection string
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.docker .env
+   # Edit .env with your MongoDB connection string:
+   # MONGO_CONNECTION_STRING=mongodb://username:password@your-host:27017/mindframe?authSource=admin
+   ```
+
+4. **Start the application**
+   ```bash
+   docker-compose up --build -d
+   ```
+
+5. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5001
+   - Nginx Proxy: http://localhost:80
+
+### Alternative: Local Development Setup
+
+#### Prerequisites
 - Python 3.9+
 - Node.js 16+
 - MongoDB
 - Redis
 
-### Backend Setup
+#### Backend Setup
 ```bash
 cd backend
 python -m venv venv
@@ -60,14 +96,14 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 ```
 
-### Frontend Setup
+#### Frontend Setup
 ```bash
 cd frontend
 npm install
 npm start
 ```
 
-### Environment Variables
+#### Environment Variables
 Copy `.env.example` to `.env` and configure:
 - Database connections
 - Google Drive credentials
@@ -118,6 +154,13 @@ Built on WeasyPrint with enhanced template processing:
 - Redis for job queuing
 - Google Drive for file storage
 - Structured logging
+
+## 📚 Documentation
+
+- **Backend**: See `backend/README.md` for detailed backend documentation
+- **Frontend**: See `frontend/README.md` for frontend setup and development
+- **Docker**: See `DOCKER_DEPLOYMENT.md` for complete Docker deployment guide
+- **External MongoDB**: See `EXTERNAL_MONGODB_SETUP.md` for MongoDB setup guide
 
 ## License
 

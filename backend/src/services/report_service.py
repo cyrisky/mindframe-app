@@ -7,14 +7,16 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import uuid
 from enum import Enum
+import time
 
 from ..models.report_model import (
     PsychologicalReport, ReportType, ReportStatus, TestResult, 
     ClientInformation
 )
 from ..models.user_model import User
+from ..utils.logging_utils import LoggingUtils
 
-logger = logging.getLogger(__name__)
+logger = LoggingUtils.get_logger(__name__)
 
 
 class ReportService:
@@ -33,6 +35,7 @@ class ReportService:
                    template_service=None, storage_service=None,
                    email_service=None, auth_service=None) -> bool:
         """Initialize report service"""
+        start_time = time.time()
         try:
             # Set service dependencies
             self.db_service = db_service
@@ -43,11 +46,23 @@ class ReportService:
             self.auth_service = auth_service
             
             self._initialized = True
-            logger.info("Report service initialized successfully")
+            
+            initialization_time = time.time() - start_time
+            logger.info("Report service initialized successfully", extra={
+                'service': 'report_service',
+                'initialization_time_ms': round(initialization_time * 1000, 2),
+                'dependencies_count': sum(1 for dep in [db_service, pdf_service, template_service, 
+                                                       storage_service, email_service, auth_service] if dep is not None)
+            })
             return True
             
         except Exception as e:
-            logger.error(f"Failed to initialize report service: {e}")
+            logger.error("Failed to initialize report service", extra={
+                'service': 'report_service',
+                'error': str(e),
+                'error_type': type(e).__name__,
+                'initialization_time_ms': round((time.time() - start_time) * 1000, 2)
+            })
             return False
     
     def health_check(self) -> Dict[str, Any]:
@@ -119,6 +134,19 @@ class ReportService:
     def create_report(self, report_data: Dict[str, Any], 
                      user_id: str = None) -> Dict[str, Any]:
         """Create a new psychological report"""
+        start_time = time.time()
+        report_id = None
+        
+        # Create contextual logger for this operation
+        context_logger = LoggingUtils.get_contextual_logger('report_service.create', {
+            'operation': 'create_report',
+            'user_id': user_id,
+            'report_type': report_data.get('report_type'),
+            'client_name': report_data.get('client_information', {}).get('name')
+        })
+        
+        context_logger.info("Starting report creation")
+        
         try:
             # Create report object
             report = PsychologicalReport(**report_data)
@@ -128,30 +156,59 @@ class ReportService:
             report.status = ReportStatus.DRAFT
             
             # Validate report data
+            validation_start = time.time()
             validation_result = self._validate_report_data(report)
+            validation_time = time.time() - validation_start
+            
             if not validation_result["valid"]:
+                context_logger.warning("Report validation failed", extra={
+                    'validation_error': validation_result['error'],
+                    'validation_time_ms': round(validation_time * 1000, 2)
+                })
                 return {
                     "success": False,
                     "error": f"Report validation failed: {validation_result['error']}",
                     "error_type": "validation"
                 }
             
+            context_logger.debug("Report validation successful", extra={
+                'validation_time_ms': round(validation_time * 1000, 2)
+            })
+            
             # Save to database
             if self.db_service:
                 try:
+                    db_start = time.time()
                     result = self.db_service.create_document(
                         "psychological_reports", report.to_dict()
                     )
                     report.id = str(result.inserted_id)
+                    report_id = report.id
+                    db_time = time.time() - db_start
+                    
+                    context_logger.debug("Report saved to database", extra={
+                        'report_id': report_id,
+                        'database_time_ms': round(db_time * 1000, 2)
+                    })
+                    
                 except Exception as e:
-                    logger.error(f"Failed to save report to database: {e}")
+                    context_logger.error("Failed to save report to database", extra={
+                        'error': str(e),
+                        'error_type': type(e).__name__,
+                        'database_time_ms': round((time.time() - db_start) * 1000, 2)
+                    })
                     return {
                         "success": False,
                         "error": str(e),
                         "error_type": "database"
                     }
             
-            logger.info(f"Created psychological report: {report.id}")
+            total_time = time.time() - start_time
+            context_logger.info("Report created successfully", extra={
+                'report_id': report_id,
+                'total_time_ms': round(total_time * 1000, 2),
+                'validation_time_ms': round(validation_time * 1000, 2)
+            })
             
             return {
                 "success": True,

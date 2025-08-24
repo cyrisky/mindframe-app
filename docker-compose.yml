@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # MongoDB service removed - using external MongoDB with connection string
+
+  # Redis Cache
+  redis:
+    image: redis:6.0-alpine
+    container_name: mindframe-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mindframe-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mindframe-backend
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      # Core Application
+      FLASK_ENV: production
+      FLASK_DEBUG: "False"
+      SECRET_KEY: ${SECRET_KEY:-your-production-secret-key}
+      BASE_URL: http://localhost:5001
+      API_BASE_URL: http://localhost:5001
+      
+      # Database
+      MONGO_URI: ${MONGO_CONNECTION_STRING}
+      REDIS_URL: redis://redis:6379
+      
+      # Authentication & Security
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-jwt-secret}
+      JWT_ACCESS_TOKEN_EXPIRES: 3600
+      JWT_REFRESH_TOKEN_EXPIRES: 2592000
+      PASSWORD_HASH_ROUNDS: 12
+      
+      # Email Configuration
+      MAIL_SERVER: ${MAIL_SERVER:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USE_TLS: ${MAIL_USE_TLS:-True}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      
+      # CORS
+      CORS_ORIGINS: http://localhost:3000,http://localhost:80
+      
+      # Rate Limiting
+      RATE_LIMIT_ENABLED: "True"
+      RATE_LIMIT_DEFAULT: "100 per hour"
+      RATE_LIMITING_REDIS_URL: redis://redis:6379/1
+    depends_on:
+      - redis
+    volumes:
+      - ./backend/storage:/app/storage
+      - ./backend/templates:/app/templates
+    networks:
+      - mindframe-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend React App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:5001
+    container_name: mindframe-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - mindframe-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: mindframe-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - mindframe-network
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  mindframe-network:
+    driver: bridge

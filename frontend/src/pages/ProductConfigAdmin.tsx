@@ -132,12 +132,12 @@ export const ProductConfigAdmin: React.FC = () => {
               </TableHeader>
               <TableBody>
                 {productConfigs.map((config) => (
-                  <TableRow key={config._id}>
+                  <TableRow key={config.id || config._id}>
                     <TableCell className="font-medium">{config.productName}</TableCell>
-                    <TableCell>{config.displayName}</TableCell>
+                    <TableCell>{config.displayName || config.productName}</TableCell>
                     <TableCell>
                       <Badge variant="secondary">
-                        {config.testCombinations.length} test{config.testCombinations.length !== 1 ? 's' : ''}
+                        {(config.testCombinations || config.tests || []).length} test{(config.testCombinations || config.tests || []).length !== 1 ? 's' : ''}
                       </Badge>
                     </TableCell>
                     <TableCell>

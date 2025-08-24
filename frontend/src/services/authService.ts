@@ -71,8 +71,14 @@ class AuthService {
    * Refresh authentication token
    */
   async refreshToken(): Promise<RefreshTokenResponse> {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+    
     const response: AxiosResponse<RefreshTokenResponse> = await apiClient.post(
-      `${this.baseURL}/refresh`
+      `${this.baseURL}/refresh`,
+      { refresh_token: refreshToken }
     );
     return response.data;
   }

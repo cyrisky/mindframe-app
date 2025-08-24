@@ -4,7 +4,12 @@ import os
 import logging
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Import services
 from src.services import (
@@ -17,6 +22,8 @@ from src.services import (
     TemplateService,
     ReportService
 )
+from src.services.product_report_service import ProductReportService
+from src.services.google_drive_service import GoogleDriveService
 
 # Import route blueprints
 from src.api.routes import (
@@ -24,17 +31,25 @@ from src.api.routes import (
     pdf_bp,
     auth_bp,
     template_bp,
-    report_bp
+    report_bp,
+    interpretation_bp,
+    admin_bp,
+    job_bp
 )
 
 # Import route initialization functions
 from src.api.routes.auth_routes import init_auth_routes
 from src.api.routes.template_routes import init_template_routes
 from src.api.routes.report_routes import init_report_routes
+from src.api.routes.interpretation_routes import init_interpretation_routes
+from src.api.routes.admin_routes import init_admin_routes
 
 # Import utilities
 from src.utils.config_utils import ConfigUtils
 from src.utils.logging_utils import LoggingUtils
+from src.utils.security_middleware import setup_security_middleware
+from src.utils.error_handler import setup_error_handling
+from src.utils.rate_limiter import setup_rate_limiting
 
 
 def create_app(config_name: str = None) -> Flask:
@@ -56,8 +71,18 @@ def create_app(config_name: str = None) -> Flask:
     # Setup logging
     setup_logging(app)
     
+    # Initialize JWT
+    jwt = JWTManager(app)
+    
     # Enable CORS
-    CORS(app, origins=['*'], supports_credentials=True)
+    cors_origins = os.getenv('CORS_ORIGINS', 'http://localhost:3000').split(',')
+    CORS(app, origins=cors_origins, supports_credentials=True)
+    
+    # Setup security middleware
+    setup_security_middleware(app)
+    
+    # Setup rate limiting
+    rate_limiter, rate_limit_decorators = setup_rate_limiting(app)
     
     # Initialize services
     services = initialize_services(app)
@@ -65,8 +90,8 @@ def create_app(config_name: str = None) -> Flask:
     # Register blueprints
     register_blueprints(app, services)
     
-    # Register error handlers
-    register_error_handlers(app)
+    # Setup centralized error handling
+    setup_error_handling(app)
     
     # Add health check endpoint
     register_health_endpoints(app, services)
@@ -89,7 +114,7 @@ def load_config(app: Flask, config_name: str) -> None:
         'TESTING': config_name == 'testing',
         
         # Database configuration
-        'MONGODB_URI': os.getenv('MONGODB_URI', 'mongodb://localhost:27017/mindframe'),
+        'MONGODB_URI': os.getenv('MONGODB_URI'),
         'MONGODB_DB': os.getenv('MONGODB_DB', 'mindframe'),
         
         # Redis configuration
@@ -115,7 +140,18 @@ def load_config(app: Flask, config_name: str) -> None:
         'JWT_SECRET_KEY': os.getenv('JWT_SECRET_KEY', app.config['SECRET_KEY']),
         'JWT_ACCESS_TOKEN_EXPIRES': int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 3600)),
         'JWT_REFRESH_TOKEN_EXPIRES': int(os.getenv('JWT_REFRESH_TOKEN_EXPIRES', 86400)),
+        'JWT_TOKEN_LOCATION': ['headers'],
         'PASSWORD_SALT_ROUNDS': int(os.getenv('PASSWORD_SALT_ROUNDS', 12)),
+        
+        # Security middleware configuration
+        'SECURITY_CSP_ENABLED': os.getenv('SECURITY_CSP_ENABLED', 'true').lower() == 'true',
+        'SECURITY_HSTS_ENABLED': os.getenv('SECURITY_HSTS_ENABLED', 'true').lower() == 'true',
+        'SECURITY_HSTS_MAX_AGE': int(os.getenv('SECURITY_HSTS_MAX_AGE', 31536000)),
+        'SECURITY_X_FRAME_OPTIONS': os.getenv('SECURITY_X_FRAME_OPTIONS', 'DENY'),
+        'SECURITY_X_CONTENT_TYPE_OPTIONS': os.getenv('SECURITY_X_CONTENT_TYPE_OPTIONS', 'nosniff'),
+        'SECURITY_REFERRER_POLICY': os.getenv('SECURITY_REFERRER_POLICY', 'strict-origin-when-cross-origin'),
+        'SECURITY_FORCE_HTTPS': os.getenv('SECURITY_FORCE_HTTPS', 'false').lower() == 'true',
+        'SECURITY_ALLOWED_HOSTS': os.getenv('SECURITY_ALLOWED_HOSTS', '').split(',') if os.getenv('SECURITY_ALLOWED_HOSTS') else [],
         
         # PDF configuration
         'PDF_TEMP_DIR': os.getenv('PDF_TEMP_DIR', './temp/pdf'),
@@ -134,6 +170,10 @@ def load_config(app: Flask, config_name: str) -> None:
         
         # File upload limits
         'MAX_CONTENT_LENGTH': int(os.getenv('MAX_CONTENT_LENGTH', 16 * 1024 * 1024)),  # 16MB
+        
+        # Google Drive configuration
+        'GOOGLE_CREDENTIALS_FILE': os.getenv('GOOGLE_CREDENTIALS_FILE'),
+        'GOOGLE_DRIVE_FOLDER_ID': os.getenv('GOOGLE_DRIVE_FOLDER_ID'),
     })
     
     # Environment-specific overrides
@@ -156,23 +196,40 @@ def setup_logging(app: Flask) -> None:
     Args:
         app: Flask application
     """
-    from src.utils.logging_utils import LogConfig
+    from src.utils.logging_utils import LogConfig, LoggingUtils
     
     log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
-    log_format = os.getenv('LOG_FORMAT', 'detailed')
-    log_file = os.getenv('LOG_FILE')
+    log_format = os.getenv('LOG_FORMAT', 'structured')
+    log_file = os.getenv('LOG_FILE', 'dev/logs/mindframe.log')
+    json_output = os.getenv('LOG_JSON', 'false').lower() == 'true'
     
     config = LogConfig(
         level=log_level,
         format_type=log_format,
         log_file=log_file,
+        max_file_size_mb=int(os.getenv('LOG_MAX_SIZE_MB', '50')),
+        backup_count=int(os.getenv('LOG_BACKUP_COUNT', '10')),
         console_output=True,
-        include_caller_info=True
+        json_output=json_output,
+        include_caller_info=True,
+        include_process_info=True,
+        include_thread_info=False
     )
     LoggingUtils.setup_logging(config)
     
+    # Setup request logging
+    LoggingUtils.setup_request_logging(app)
+    
     # Set Flask app logger
     app.logger = LoggingUtils.get_logger('mindframe.app')
+    
+    # Log application startup
+    app.logger.info("Logging system initialized", extra={
+        'log_level': log_level,
+        'log_format': log_format,
+        'log_file': log_file,
+        'json_output': json_output
+    })
 
 
 def initialize_services(app: Flask) -> dict:
@@ -213,15 +270,15 @@ def initialize_services(app: Flask) -> dict:
         # Initialize storage service
         services['storage'] = StorageService()
         try:
-            storage_config = {
-                'type': app.config.get('STORAGE_TYPE', 'local'),
-                'local_path': app.config.get('STORAGE_PATH', 'tmp/storage'),
-                'aws_bucket': app.config.get('AWS_S3_BUCKET'),
-                'aws_access_key': app.config.get('AWS_ACCESS_KEY_ID'),
-                'aws_secret_key': app.config.get('AWS_SECRET_ACCESS_KEY'),
-                'aws_region': app.config.get('AWS_REGION')
-            }
-            if not services['storage'].initialize(storage_config):
+            local_storage_path = app.config.get('STORAGE_PATH', './storage')
+            gcs_credentials_path = app.config.get('GOOGLE_CREDENTIALS_FILE')
+            gcs_bucket_name = app.config.get('GOOGLE_DRIVE_FOLDER_ID')
+            
+            if not services['storage'].initialize(
+                local_storage_path=local_storage_path,
+                gcs_credentials_path=gcs_credentials_path,
+                gcs_bucket_name=gcs_bucket_name
+            ):
                 app.logger.warning("Failed to initialize storage service - running without storage")
                 services['storage'] = None
         except Exception as e:
@@ -231,14 +288,15 @@ def initialize_services(app: Flask) -> dict:
         # Initialize email service
         services['email'] = EmailService()
         try:
-            email_config = {
-                'smtp_server': app.config.get('SMTP_SERVER', 'localhost'),
-                'smtp_port': app.config.get('SMTP_PORT', 587),
-                'username': app.config.get('SMTP_USERNAME'),
-                'password': app.config.get('SMTP_PASSWORD'),
-                'use_tls': app.config.get('SMTP_USE_TLS', True),
-                'from_email': app.config.get('EMAIL_FROM', 'noreply@mindframe.com')
-            }
+            from src.services.email_service import EmailConfig
+            email_config = EmailConfig(
+                smtp_server=app.config.get('SMTP_SERVER', 'localhost'),
+                smtp_port=app.config.get('SMTP_PORT', 587),
+                username=app.config.get('SMTP_USERNAME'),
+                password=app.config.get('SMTP_PASSWORD'),
+                use_tls=app.config.get('SMTP_USE_TLS', True),
+                from_email=app.config.get('EMAIL_FROM', 'noreply@mindframe.com')
+            )
             if not services['email'].initialize(email_config):
                 app.logger.warning("Email service initialization failed - running without email")
                 services['email'] = None
@@ -277,13 +335,12 @@ def initialize_services(app: Flask) -> dict:
         # Initialize PDF service
         services['pdf'] = PDFService()
         try:
-            pdf_config = {
-                'temp_dir': app.config.get('PDF_TEMP_DIR', 'tmp/pdfs'),
-                'max_size': app.config.get('PDF_MAX_SIZE', 50 * 1024 * 1024)  # 50MB
-            }
             if not services['pdf'].initialize(
-                services['storage'],
-                pdf_config
+                db_service=services['database'],
+                storage_service=None,  # No longer using local storage
+                email_service=services['email'],
+                google_drive_service=services.get('google_drive'),
+                max_workers=4
             ):
                 app.logger.warning("PDF service initialization failed - running without PDF generation")
                 services['pdf'] = None
@@ -320,6 +377,38 @@ def initialize_services(app: Flask) -> dict:
             app.logger.warning(f"Report service initialization failed: {e} - running without reports")
             services['report'] = None
         
+        # Initialize Google Drive service
+        try:
+            credentials_file = app.config.get('GOOGLE_CREDENTIALS_FILE')
+            folder_id = app.config.get('GOOGLE_DRIVE_FOLDER_ID')
+            
+            if credentials_file and os.path.exists(credentials_file):
+                services['google_drive'] = GoogleDriveService(
+                    credentials_path=credentials_file,
+                    folder_id=folder_id
+                )
+                app.logger.info("Google Drive service initialized successfully")
+            else:
+                app.logger.warning(f"Google Drive credentials file not found: {credentials_file} - running without Google Drive")
+                services['google_drive'] = None
+        except Exception as e:
+            app.logger.warning(f"Google Drive service initialization failed: {e} - running without Google Drive")
+            services['google_drive'] = None
+        
+        # Initialize product report service
+        services['product_report'] = ProductReportService()
+        try:
+            if not services['product_report'].initialize(
+                services['database'],
+                services['pdf'],
+                services.get('google_drive')  # Optional Google Drive service
+            ):
+                app.logger.warning("Product report service initialization failed - running without product reports")
+                services['product_report'] = None
+        except Exception as e:
+            app.logger.warning(f"Product report service initialization failed: {e} - running without product reports")
+            services['product_report'] = None
+        
         app.logger.info("Service initialization completed")
         return services
         
@@ -341,7 +430,11 @@ def register_blueprints(app: Flask, services: dict) -> None:
     if services.get('auth') and services.get('template'):
         init_template_routes(services['auth'], services['template'])
     if services.get('auth') and services.get('report'):
-        init_report_routes(services['auth'], services['report'])
+        init_report_routes(services['auth'], services['report'], services.get('product_report'))
+    if services.get('auth'):
+        init_interpretation_routes(services['auth'], services.get('database'))
+    if services.get('auth'):
+        init_admin_routes(services['auth'], services.get('database'))
     
     # Register blueprints
     app.register_blueprint(health_bp)
@@ -349,81 +442,15 @@ def register_blueprints(app: Flask, services: dict) -> None:
     app.register_blueprint(auth_bp)
     app.register_blueprint(template_bp)
     app.register_blueprint(report_bp)
+    app.register_blueprint(interpretation_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(job_bp, url_prefix='/api/v1/jobs')
     
     app.logger.info("All blueprints registered successfully")
 
 
-def register_error_handlers(app: Flask) -> None:
-    """Register error handlers
-    
-    Args:
-        app: Flask application
-    """
-    @app.errorhandler(400)
-    def bad_request(error):
-        return jsonify({
-            'success': False,
-            'error': 'Bad request',
-            'message': str(error.description) if hasattr(error, 'description') else 'Invalid request'
-        }), 400
-    
-    @app.errorhandler(401)
-    def unauthorized(error):
-        return jsonify({
-            'success': False,
-            'error': 'Unauthorized',
-            'message': 'Authentication required'
-        }), 401
-    
-    @app.errorhandler(403)
-    def forbidden(error):
-        return jsonify({
-            'success': False,
-            'error': 'Forbidden',
-            'message': 'Insufficient permissions'
-        }), 403
-    
-    @app.errorhandler(404)
-    def not_found(error):
-        return jsonify({
-            'success': False,
-            'error': 'Not found',
-            'message': 'Resource not found'
-        }), 404
-    
-    @app.errorhandler(413)
-    def payload_too_large(error):
-        return jsonify({
-            'success': False,
-            'error': 'Payload too large',
-            'message': 'Request entity too large'
-        }), 413
-    
-    @app.errorhandler(429)
-    def rate_limit_exceeded(error):
-        return jsonify({
-            'success': False,
-            'error': 'Rate limit exceeded',
-            'message': 'Too many requests'
-        }), 429
-    
-    @app.errorhandler(500)
-    def internal_error(error):
-        app.logger.error(f"Internal server error: {error}")
-        return jsonify({
-            'success': False,
-            'error': 'Internal server error',
-            'message': 'An unexpected error occurred'
-        }), 500
-    
-    @app.errorhandler(Exception)
-    def handle_exception(error):
-        app.logger.error(f"Unhandled exception: {error}")
-        return jsonify({
-            'success': False,
-            'error': 'Internal server error',
-            'message': 'An unexpected error occurred'
-        }), 500
+# Error handling is now managed by the centralized error handler
+# See src/utils/error_handler.py for implementation details
 
 
 def register_health_endpoints(app: Flask, services: dict) -> None:
@@ -486,7 +513,7 @@ app = create_app()
 
 if __name__ == '__main__':
     # Development server
-    port = int(os.getenv('PORT', 5000))
+    port = int(os.getenv('PORT', 5001))
     debug = os.getenv('FLASK_ENV') == 'development'
     
     app.logger.info(f"Starting Mindframe application on port {port}")

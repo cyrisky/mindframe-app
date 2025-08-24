@@ -318,7 +318,7 @@ class LoggingUtils:
         Returns:
             Decorator function
         """
-        def decorator(func):
+        def logging_decorator(func):
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
                 # Get logger
@@ -371,7 +371,7 @@ class LoggingUtils:
                     raise
             
             return wrapper
-        return decorator
+        return logging_decorator
     
     @classmethod
     def log_performance(cls, logger: logging.Logger = None, level: str = 'INFO', 
@@ -386,7 +386,7 @@ class LoggingUtils:
         Returns:
             Decorator function
         """
-        def decorator(func):
+        def performance_decorator(func):
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
                 func_logger = logger or cls.get_logger(func.__module__)
@@ -403,7 +403,7 @@ class LoggingUtils:
                 return result
             
             return wrapper
-        return decorator
+        return performance_decorator
     
     @classmethod
     def log_exception(cls, logger: logging.Logger, message: str = None, 

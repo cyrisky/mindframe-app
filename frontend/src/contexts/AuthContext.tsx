@@ -29,6 +29,7 @@ interface AuthContextType {
   updateProfile: (data: Partial<User>) => Promise<void>;
   clearError: () => void;
   refreshToken: () => Promise<void>;
+  clearStorage: () => void;
 }
 
 // Initial State
@@ -140,6 +141,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login(credentials);
       
       localStorage.setItem('token', response.token);
+      localStorage.setItem('refreshToken', response.refreshToken);
       dispatch({ 
         type: 'AUTH_SUCCESS', 
         payload: { user: response.user, token: response.token } 
@@ -175,6 +177,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Clear storage function
+  const clearStorage = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    // Clear any other auth-related items
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('auth_') || key.includes('token') || key.includes('Token')) {
+        localStorage.removeItem(key);
+      }
+    });
+  };
+
   // Logout function
   const logout = async () => {
     try {
@@ -182,7 +197,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      localStorage.removeItem('token');
+      clearStorage();
       dispatch({ type: 'AUTH_LOGOUT' });
       toast.success('Logged out successfully');
     }
@@ -230,6 +245,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateProfile,
     clearError,
     refreshToken,
+    clearStorage,
   };
 
   return (

@@ -2,6 +2,7 @@
 
 import os
 import logging
+import tempfile
 from typing import Dict, Any, List, Optional, Union
 from datetime import datetime
 from pathlib import Path
@@ -29,11 +30,12 @@ class PDFService:
         self.db_service = None
         self.storage_service = None
         self.email_service = None
+        self.google_drive_service = None
         self.executor = None
         self._initialized = False
     
     def initialize(self, db_service=None, storage_service=None, 
-                   email_service=None, max_workers: int = 4) -> bool:
+                   email_service=None, google_drive_service=None, max_workers: int = 4) -> bool:
         """Initialize PDF service"""
         try:
             # Initialize core components
@@ -41,23 +43,18 @@ class PDFService:
             self.template_processor = TemplateProcessor()
             self.layout_engine = LayoutEngine()
             
-            # Set service dependencies
+            # Store service references
             self.db_service = db_service
+            # storage_service is deprecated - keeping for backward compatibility but not used
             self.storage_service = storage_service
             self.email_service = email_service
+            self.google_drive_service = google_drive_service
             
             # Initialize thread pool for async operations
             self.executor = ThreadPoolExecutor(max_workers=max_workers)
             
-            # Initialize core components
-            if not self.pdf_generator.initialize():
-                raise Exception("Failed to initialize PDF generator")
-            
-            if not self.template_processor.initialize():
-                raise Exception("Failed to initialize template processor")
-            
-            if not self.layout_engine.initialize():
-                raise Exception("Failed to initialize layout engine")
+            # Core components are initialized in their constructors
+            # No additional initialization needed
             
             self._initialized = True
             logger.info("PDF service initialized successfully")
@@ -144,7 +141,7 @@ class PDFService:
                               options: Dict[str, Any] = None,
                               user_id: str = None,
                               filename: str = None) -> Dict[str, Any]:
-        """Generate PDF from HTML content"""
+        """Generate PDF from HTML content and upload to Google Drive"""
         try:
             # Generate unique filename if not provided
             if not filename:
@@ -153,18 +150,28 @@ class PDFService:
             # Generate PDF
             pdf_content = self.pdf_generator.generate_from_html(html_content, options)
             
-            # Save to storage
-            file_info = None
-            if self.storage_service:
-                file_info = self.storage_service.save_file(
-                    pdf_content, filename, "pdfs"
-                )
+            # Create temporary file for Google Drive upload
+            google_drive_result = None
+            with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp_file:
+                temp_file.write(pdf_content)
+                temp_file_path = temp_file.name
             
-            # Create PDF document record
+            try:
+                # Upload to Google Drive
+                google_drive_result = self.upload_to_google_drive(
+                    file_path=temp_file_path,
+                    file_name=filename
+                )
+            finally:
+                # Clean up temporary file
+                if os.path.exists(temp_file_path):
+                    os.unlink(temp_file_path)
+            
+            # Create PDF document record with Google Drive info
             pdf_doc = PDFDocument(
                 filename=filename,
                 file_size=len(pdf_content),
-                file_path=file_info.get("relative_path") if file_info else None,
+                file_path=google_drive_result.get('web_view_link') if google_drive_result and google_drive_result.get('success') else None,
                 content_type="application/pdf",
                 user_id=user_id,
                 generation_method="html",
@@ -187,7 +194,7 @@ class PDFService:
             return {
                 "success": True,
                 "pdf_document": pdf_doc.to_dict(),
-                "file_info": file_info,
+                "google_drive_result": google_drive_result,
                 "size": len(pdf_content)
             }
             
@@ -611,6 +618,41 @@ class PDFService:
         except Exception as e:
             logger.error(f"Error cleaning up old documents: {e}")
             return 0
+    
+    def upload_to_google_drive(self, file_path: str, file_name: str = None) -> Dict[str, Any]:
+        """Upload a PDF file to Google Drive
+        
+        Args:
+            file_path (str): Local path to the PDF file
+            file_name (str, optional): Name for the file in Drive
+            
+        Returns:
+            Dict[str, Any]: Upload result containing file ID and web view link
+        """
+        try:
+            if not self.google_drive_service:
+                return {
+                    'success': False,
+                    'error': 'Google Drive service not initialized',
+                    'message': 'Google Drive service not available'
+                }
+            
+            # Upload to Google Drive
+            result = self.google_drive_service.upload_file(
+                file_path=file_path,
+                file_name=file_name,
+                mime_type='application/pdf'
+            )
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error uploading to Google Drive: {e}")
+            return {
+                'success': False,
+                'error': str(e),
+                'message': 'Failed to upload to Google Drive'
+            }
     
     def shutdown(self):
         """Shutdown PDF service"""

@@ -5,11 +5,13 @@ import uuid
 from datetime import datetime
 from flask import Blueprint, request, jsonify, current_app, send_file
 from werkzeug.utils import secure_filename
+from pydantic import ValidationError
 from ...core.pdf_generator import PDFGenerator, PDFGenerationError
 from ...services.pdf_service import PDFService
 from ...services.template_service import TemplateService
-from ...utils.validation_utils import validate_pdf_request, validate_template_data
 from ...utils.decorators import rate_limit, require_api_key
+from ...utils.input_validation import validate_json, ValidationError as InputValidationError
+from ...models.request_models import PDFFromHtmlRequest, PDFFromTemplateRequest, PsychologicalReportRequest
 
 
 pdf_bp = Blueprint('pdf', __name__)
@@ -17,6 +19,7 @@ pdf_bp = Blueprint('pdf', __name__)
 
 @pdf_bp.route('/pdf/generate', methods=['POST'])
 @rate_limit('10 per minute')
+@validate_json(pydantic_model=PDFFromHtmlRequest)
 def generate_pdf():
     """Generate PDF from HTML content
     
@@ -35,19 +38,11 @@ def generate_pdf():
         PDF file or JSON with download URL
     """
     try:
-        data = request.get_json()
-        
-        # Validate request data
-        validation_result = validate_pdf_request(data)
-        if not validation_result['valid']:
-            return jsonify({
-                'error': 'Invalid request data',
-                'details': validation_result['errors']
-            }), 400
-        
-        html_content = data['html_content']
-        css_content = data.get('css_content')
-        options = data.get('options', {})
+        # Access validated data
+        validated_data = request.validated_data
+        html_content = validated_data['html_content']
+        css_content = validated_data.get('css_content')
+        options = validated_data.get('options', {})
         
         # Initialize PDF service
         pdf_service = PDFService()
@@ -78,6 +73,20 @@ def generate_pdf():
                 'generated_at': result['generated_at']
             })
             
+    except ValidationError as e:
+        current_app.logger.warning(f"Validation error in PDF generation: {str(e)}")
+        return jsonify({
+            'error': 'Validation failed',
+            'details': e.errors()
+        }), 400
+        
+    except InputValidationError as e:
+        current_app.logger.warning(f"Input validation error in PDF generation: {str(e)}")
+        return jsonify({
+            'error': 'Invalid input',
+            'message': str(e)
+        }), 400
+        
     except PDFGenerationError as e:
         current_app.logger.error(f"PDF generation error: {str(e)}")
         return jsonify({
@@ -95,6 +104,7 @@ def generate_pdf():
 
 @pdf_bp.route('/pdf/generate-from-template', methods=['POST'])
 @rate_limit('10 per minute')
+@validate_json(pydantic_model=PDFFromTemplateRequest)
 def generate_pdf_from_template():
     """Generate PDF from template
     
@@ -113,26 +123,11 @@ def generate_pdf_from_template():
         PDF file or JSON with download URL
     """
     try:
-        data = request.get_json()
-        
-        # Validate request data
-        if not data or 'template_name' not in data or 'data' not in data:
-            return jsonify({
-                'error': 'Invalid request data',
-                'message': 'template_name and data are required'
-            }), 400
-        
-        template_name = data['template_name']
-        template_data = data['data']
-        options = data.get('options', {})
-        
-        # Validate template data
-        validation_result = validate_template_data(template_name, template_data)
-        if not validation_result['valid']:
-            return jsonify({
-                'error': 'Invalid template data',
-                'details': validation_result['errors']
-            }), 400
+        # Access validated data
+        validated_data = request.validated_data
+        template_name = validated_data['template_name']
+        template_data = validated_data['data']
+        options = validated_data.get('options', {})
         
         # Initialize PDF service
         pdf_service = PDFService()
@@ -163,6 +158,20 @@ def generate_pdf_from_template():
                 'generated_at': result['generated_at']
             })
             
+    except ValidationError as e:
+        current_app.logger.warning(f"Validation error in PDF template generation: {str(e)}")
+        return jsonify({
+            'error': 'Validation failed',
+            'details': e.errors()
+        }), 400
+        
+    except InputValidationError as e:
+        current_app.logger.warning(f"Input validation error in PDF template generation: {str(e)}")
+        return jsonify({
+            'error': 'Invalid input',
+            'message': str(e)
+        }), 400
+        
     except PDFGenerationError as e:
         current_app.logger.error(f"PDF generation error: {str(e)}")
         return jsonify({
@@ -180,6 +189,7 @@ def generate_pdf_from_template():
 
 @pdf_bp.route('/pdf/generate-report', methods=['POST'])
 @rate_limit('5 per minute')
+@validate_json(pydantic_model=PsychologicalReportRequest)
 def generate_psychological_report():
     """Generate psychological test report PDF
     
@@ -209,25 +219,20 @@ def generate_psychological_report():
         PDF file or JSON with download URL
     """
     try:
-        data = request.get_json()
-        
-        # Validate required fields
-        required_fields = ['patient_info', 'test_results']
-        for field in required_fields:
-            if field not in data:
-                return jsonify({
-                    'error': 'Invalid request data',
-                    'message': f'{field} is required'
-                }), 400
+        # Access validated data
+        validated_data = request.validated_data
+        patient_info = validated_data['patient_info']
+        test_results = validated_data['test_results']
+        template_options = validated_data.get('template_options', {})
         
         # Initialize PDF service
         pdf_service = PDFService()
         
         # Generate psychological report
         result = pdf_service.generate_psychological_report(
-            patient_info=data['patient_info'],
-            test_results=data['test_results'],
-            template_options=data.get('template_options', {})
+            patient_info=patient_info,
+            test_results=test_results,
+            template_options=template_options
         )
         
         if request.args.get('download') == 'true':
@@ -250,6 +255,20 @@ def generate_psychological_report():
                 'report_type': 'psychological_report'
             })
             
+    except ValidationError as e:
+        current_app.logger.warning(f"Validation error in psychological report generation: {str(e)}")
+        return jsonify({
+            'error': 'Validation failed',
+            'details': e.errors()
+        }), 400
+        
+    except InputValidationError as e:
+        current_app.logger.warning(f"Input validation error in psychological report generation: {str(e)}")
+        return jsonify({
+            'error': 'Invalid input',
+            'message': str(e)
+        }), 400
+        
     except PDFGenerationError as e:
         current_app.logger.error(f"Report generation error: {str(e)}")
         return jsonify({

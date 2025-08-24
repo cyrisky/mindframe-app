@@ -46,12 +46,19 @@ export const ProductConfigForm: React.FC<ProductConfigFormProps> = ({
   useEffect(() => {
     loadAvailableTests();
     if (config) {
+      // Handle both 'testCombinations' and 'tests' field names for backward compatibility
+      const tests = config.testCombinations || config.tests || [];
       setFormData({
         productName: config.productName,
-        displayName: config.displayName,
+        displayName: config.displayName || '',
         description: config.description || '',
-        testCombinations: [...config.testCombinations],
-        staticContent: { ...config.staticContent }
+        testCombinations: [...tests],
+        staticContent: {
+          introduction: config.staticContent?.introduction || '',
+          conclusion: config.staticContent?.conclusion || '',
+          coverPageTitle: config.staticContent?.coverPageTitle || '',
+          coverPageSubtitle: config.staticContent?.coverPageSubtitle || ''
+        }
       });
     }
   }, [config]);

@@ -8,7 +8,8 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any, List, Tuple
 from functools import wraps
-from flask import request, jsonify, current_app
+from flask import request, jsonify, current_app, g
+from flask_jwt_extended import create_access_token, create_refresh_token, decode_token
 import redis
 from dataclasses import dataclass
 
@@ -121,12 +122,12 @@ class AuthService:
             logger.error(f"Error verifying password: {e}")
             return False
     
-    def validate_password_strength(self, password: str) -> Tuple[bool, List[str]]:
+    def validate_password_strength(self, password: str) -> tuple[bool, list[str]]:
         """Validate password strength"""
         errors = []
         
-        if len(password) < self.config.password_min_length:
-            errors.append(f"Password must be at least {self.config.password_min_length} characters long")
+        if len(password) < 8:
+            errors.append("Password must be at least 8 characters long")
         
         if not any(c.isupper() for c in password):
             errors.append("Password must contain at least one uppercase letter")
@@ -135,7 +136,12 @@ class AuthService:
             errors.append("Password must contain at least one lowercase letter")
         
         if not any(c.isdigit() for c in password):
-            errors.append("Password must contain at least one digit")
+            errors.append("Password must contain at least one number")
+        
+        if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password):
+            errors.append("Password must contain at least one special character")
+        
+        return len(errors) == 0, errors
         
         if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password):
             errors.append("Password must contain at least one special character")
@@ -145,39 +151,35 @@ class AuthService:
     # JWT token utilities
     def generate_access_token(self, user_id: str, email: str, 
                              roles: List[str] = None) -> str:
-        """Generate simple JWT access token"""
-        import time
-        payload = {
-            'user_id': str(user_id),
+        """Generate JWT access token using Flask-JWT-Extended"""
+        additional_claims = {
             'email': str(email),
             'roles': roles or [],
-            'type': 'access',
-            'iat': int(time.time()),
-            'exp': int(time.time()) + self.config.access_token_expires
+            'type': 'access'
         }
         
-        return jwt.encode(payload, str(self.config.jwt_secret_key), algorithm=str(self.config.jwt_algorithm))
+        return create_access_token(
+            identity=str(user_id),
+            additional_claims=additional_claims,
+            expires_delta=timedelta(seconds=self.config.access_token_expires)
+        )
     
     def generate_refresh_token(self, user_id: str) -> str:
-        """Generate simple JWT refresh token"""
-        import time
-        payload = {
-            'user_id': str(user_id),
-            'type': 'refresh',
-            'iat': int(time.time()),
-            'exp': int(time.time()) + self.config.refresh_token_expires
+        """Generate JWT refresh token using Flask-JWT-Extended"""
+        additional_claims = {
+            'type': 'refresh'
         }
         
-        return jwt.encode(payload, str(self.config.jwt_secret_key), algorithm=str(self.config.jwt_algorithm))
+        return create_refresh_token(
+            identity=str(user_id),
+            additional_claims=additional_claims,
+            expires_delta=timedelta(seconds=self.config.refresh_token_expires)
+        )
     
     def verify_token(self, token: str) -> Optional[Dict[str, Any]]:
-        """Verify and decode JWT token"""
+        """Verify and decode JWT token using Flask-JWT-Extended"""
         try:
-            payload = jwt.decode(
-                token, 
-                self.config.jwt_secret_key, 
-                algorithms=[self.config.jwt_algorithm]
-            )
+            payload = decode_token(token)
             
             # Check if token is blacklisted
             if self.redis_client and self.is_token_blacklisted(token):
@@ -185,11 +187,8 @@ class AuthService:
             
             return payload
             
-        except jwt.ExpiredSignatureError:
-            logger.warning("Token has expired")
-            return None
-        except jwt.InvalidTokenError as e:
-            logger.warning(f"Invalid token: {e}")
+        except Exception as e:
+            logger.warning(f"Token verification failed: {e}")
             return None
     
     def blacklist_token(self, token: str) -> bool:
@@ -537,44 +536,216 @@ class AuthService:
             return False
     
     # User authentication
-    def login_user(self, email: str, password: str, ip_address: str = None, user_agent: str = None) -> Dict[str, Any]:
-        """Very simple authentication with static credentials"""
+    def register_user(self, email: str, password: str, first_name: str = None, 
+                      last_name: str = None, role: str = 'user') -> Dict[str, Any]:
+        """Register a new user"""
         try:
-            print(f"LOGIN ATTEMPT: email={email}, password={password}")
-            
-            # Static authentication - hardcoded credentials
-            STATIC_EMAIL = "admin@mail.com"
-            STATIC_PASSWORD = "admin123"
-            
-            print(f"COMPARING: {email} == {STATIC_EMAIL} and {password} == {STATIC_PASSWORD}")
-            
-            # Simple credential validation
-            if email == STATIC_EMAIL and password == STATIC_PASSWORD:
-                print("LOGIN SUCCESS")
-                # Return simple success response without JWT tokens
-                user_info = {
-                    'id': "admin_user_001",
-                    'email': email,
-                    'roles': ["admin", "user"]
-                }
-                
+            # Check if user already exists
+            existing_user = self.db_service.find_one('users', {'email': email})
+            if existing_user:
                 return {
-                    'success': True,
-                    'access_token': "simple_token_123",
-                    'refresh_token': "simple_refresh_456",
-                    'user': user_info
+                    'success': False,
+                    'error': 'User with this email already exists'
                 }
-            else:
-                print("LOGIN FAILED - WRONG CREDENTIALS")
+            
+            # Validate password strength
+            is_valid, errors = self.validate_password_strength(password)
+            if not is_valid:
+                return {
+                    'success': False,
+                    'error': f"Password validation failed: {', '.join(errors)}"
+                }
+            
+            # Hash password
+            password_hash = self.hash_password(password)
+            
+            # Create user document
+            from ..models.user_model import User, UserPreferences, UserQuota
+            
+            # Generate username from email if not provided
+            username = email.split('@')[0]
+            counter = 1
+            original_username = username
+            while self.db_service.find_one('users', {'username': username}):
+                username = f"{original_username}{counter}"
+                counter += 1
+            
+            user = User(
+                username=username,
+                email=email,
+                password_hash=password_hash,
+                salt='',  # bcrypt handles salt internally
+                first_name=first_name,
+                last_name=last_name,
+                roles=[role] if role else ['user'],
+                preferences=UserPreferences(),
+                quota=UserQuota()
+            )
+            
+            # Convert to dict and insert into database
+            user_dict = user.to_dict()
+            user_id = self.db_service.insert_one('users', user_dict)
+            
+            logger.info(f"User registered successfully: {email}")
+            return {
+                'success': True,
+                'user_id': str(user_id),
+                'message': 'User registered successfully'
+            }
+            
+        except Exception as e:
+            logger.error(f"Registration error: {e}")
+            return {
+                'success': False,
+                'error': 'Registration failed'
+            }
+
+    def login_user(self, email: str, password: str, ip_address: str = None, user_agent: str = None) -> Dict[str, Any]:
+        """Login user with email and password"""
+        try:
+            # Check if account is locked
+            if self.is_account_locked(email):
+                return {
+                    'success': False,
+                    'error': 'Account is temporarily locked due to too many failed login attempts'
+                }
+            
+            # Get user from database
+            user_data = self.db_service.find_one('users', {'email': email})
+            if not user_data:
+                self.record_login_attempt(email, False, ip_address)
                 return {
                     'success': False,
                     'error': 'Invalid email or password'
                 }
+            
+            # Verify password
+            if not self.verify_password(password, user_data['password_hash']):
+                self.record_login_attempt(email, False, ip_address)
+                return {
+                    'success': False,
+                    'error': 'Invalid email or password'
+                }
+            
+            # Check if user is active
+            if not user_data.get('is_active', True):
+                return {
+                    'success': False,
+                    'error': 'Account is deactivated'
+                }
+            
+            # Record successful login
+            self.record_login_attempt(email, True, ip_address)
+            
+            # Generate tokens
+            access_token = self.generate_access_token(
+                user_data['_id'], 
+                user_data['email'],
+                user_data.get('roles', [])
+            )
+            refresh_token = self.generate_refresh_token(user_data['_id'])
+            
+            # Create session
+            session_id = self.create_session(user_data['_id'], {
+                'ip_address': ip_address,
+                'user_agent': user_agent,
+                'login_time': datetime.utcnow().isoformat()
+            })
+            
+            return {
+                'success': True,
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+                'session_id': session_id,
+                'user': {
+                    'id': str(user_data['_id']),
+                    'email': user_data['email'],
+                    'first_name': user_data.get('first_name'),
+                    'last_name': user_data.get('last_name'),
+                    'roles': user_data.get('roles', [])
+                }
+            }
+            
         except Exception as e:
-            print(f"LOGIN ERROR: {e}")
+            logger.error(f"Login error: {e}")
             return {
                 'success': False,
-                'error': 'Login failed due to server error'
+                'error': 'Login failed'
+            }
+    
+    def refresh_access_token(self, refresh_token: str) -> Dict[str, Any]:
+        """Refresh access token using refresh token"""
+        try:
+            # Verify refresh token
+            payload = self.verify_token(refresh_token)
+            if not payload:
+                return {
+                    'success': False,
+                    'error': 'Invalid or expired refresh token'
+                }
+            
+            # Check if it's actually a refresh token
+            if payload.get('type') != 'refresh':
+                return {
+                    'success': False,
+                    'error': 'Invalid token type'
+                }
+            
+            user_id = payload.get('sub')
+            if not user_id:
+                return {
+                    'success': False,
+                    'error': 'Invalid token payload'
+                }
+            
+            # Get user data from database
+            if self.db_service:
+                user_data = self.db_service.get_user(user_id)
+                if not user_data:
+                    return {
+                        'success': False,
+                        'error': 'User not found'
+                    }
+                
+                # Generate new access token
+                new_access_token = self.generate_access_token(
+                    user_id=user_id,
+                    email=user_data.get('email', ''),
+                    roles=user_data.get('roles', [])
+                )
+                
+                return {
+                    'success': True,
+                    'access_token': new_access_token,
+                    'user': {
+                        'id': user_id,
+                        'email': user_data.get('email'),
+                        'first_name': user_data.get('first_name'),
+                        'last_name': user_data.get('last_name'),
+                        'roles': user_data.get('roles', [])
+                    }
+                }
+            else:
+                # Fallback if no db_service (generate token with minimal data)
+                new_access_token = self.generate_access_token(
+                    user_id=user_id,
+                    email='',  # Will need to be populated from token or DB
+                    roles=[]
+                )
+                
+                return {
+                    'success': True,
+                    'access_token': new_access_token,
+                    'user': {
+                        'id': user_id
+                    }
+                }
+                
+        except Exception as e:
+            logger.error(f"Refresh token error: {e}")
+            return {
+                'success': False,
+                'error': 'Token refresh failed'
             }
     
     # Decorators for route protection
@@ -594,7 +765,7 @@ class AuthService:
             if api_key:
                 api_key_data = self.verify_api_key(api_key)
                 if api_key_data:
-                    request.current_user = {'user_id': api_key_data['user_id'], 'auth_type': 'api_key'}
+                    g.current_user = {'user_id': api_key_data['user_id'], 'auth_type': 'api_key'}
                     return f(*args, **kwargs)
             
             if not token:
@@ -604,44 +775,44 @@ class AuthService:
             if not payload:
                 return jsonify({'error': 'Invalid or expired token'}), 401
             
-            request.current_user = payload
+            g.current_user = payload
             return f(*args, **kwargs)
         
         return decorated_function
     
     def require_roles(self, roles: List[str]):
         """Decorator to require specific roles"""
-        def decorator(f):
+        def roles_decorator(f):
             @wraps(f)
             def decorated_function(*args, **kwargs):
-                if not hasattr(request, 'current_user'):
+                if not hasattr(g, 'current_user') or not g.current_user:
                     return jsonify({'error': 'Authentication required'}), 401
                 
-                user_roles = request.current_user.get('roles', [])
+                user_roles = g.current_user.get('roles', [])
                 if not any(role in user_roles for role in roles):
                     return jsonify({'error': 'Insufficient permissions'}), 403
                 
                 return f(*args, **kwargs)
             return decorated_function
-        return decorator
+        return roles_decorator
     
     def require_permission(self, permission: str):
         """Decorator to require specific permission"""
-        def decorator(f):
+        def permission_decorator(f):
             @wraps(f)
             def decorated_function(*args, **kwargs):
-                if not hasattr(request, 'current_user'):
+                if not hasattr(g, 'current_user') or not g.current_user:
                     return jsonify({'error': 'Authentication required'}), 401
                 
                 # This would need to be implemented based on your permission system
                 # For now, just check if user has admin role
-                user_roles = request.current_user.get('roles', [])
+                user_roles = g.current_user.get('roles', [])
                 if 'admin' not in user_roles:
                     return jsonify({'error': 'Insufficient permissions'}), 403
                 
                 return f(*args, **kwargs)
             return decorated_function
-        return decorator
+        return permission_decorator
 
 
 # Global auth service instance

@@ -1,10 +1,12 @@
 export interface ProductConfig {
-  _id?: string;
+  id?: string;
+  _id?: string; // For backward compatibility
   productName: string;
-  displayName: string;
+  displayName?: string;
   description?: string;
-  testCombinations: TestCombination[];
-  staticContent: StaticContent;
+  testCombinations?: TestCombination[];
+  tests?: TestCombination[]; // Backend uses 'tests' field
+  staticContent?: StaticContent;
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;

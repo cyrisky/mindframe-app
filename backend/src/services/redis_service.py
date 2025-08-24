@@ -26,7 +26,7 @@ class RedisService:
         try:
             # Use provided parameters or environment variables
             self._connection_params = {
-                'host': host or os.getenv('REDIS_HOST', 'localhost'),
+                'host': host or os.getenv('REDIS_HOST', os.getenv('REDIS_URL', 'redis://localhost:6379').split('://')[1].split(':')[0] if '://' in os.getenv('REDIS_URL', 'redis://localhost:6379') else 'localhost'),
                 'port': port or int(os.getenv('REDIS_PORT', 6379)),
                 'password': password or os.getenv('REDIS_PASSWORD'),
                 'db': db or int(os.getenv('REDIS_DB', 0)),

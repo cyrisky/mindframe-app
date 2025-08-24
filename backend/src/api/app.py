@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from .routes.pdf_routes import pdf_bp
 from .routes.health_routes import health_bp
+from .routes.job_routes import job_bp
 from ..services.database_service import DatabaseService
 from ..services.redis_service import RedisService
 from ..utils.logging_utils import LoggingUtils, LogConfig
@@ -46,11 +47,8 @@ def create_app(config_name: str = None) -> Flask:
     configure_app(app, config_name)
     
     # Setup CORS
-    CORS(app, origins=[
-        "http://localhost:3000",  # React dev server
-        "http://localhost:3000",  # Vite dev server
-        "https://mindframe-app.com"  # Production domain
-    ])
+    cors_origins = os.getenv('CORS_ORIGINS', 'http://localhost:3000').split(',')
+    CORS(app, origins=cors_origins, supports_credentials=True)
     
     # Setup logging
     setup_logging(app)
@@ -83,7 +81,7 @@ def configure_app(app: Flask, config_name: str = None) -> None:
         'TESTING': config_name == 'testing',
         
         # Database configuration
-        'MONGODB_URI': os.getenv('MONGODB_URI', 'mongodb://localhost:27017/mindframe'),
+        'MONGODB_URI': os.getenv('MONGODB_URI'),
         'MONGODB_DB_NAME': os.getenv('MONGODB_DB_NAME', 'mindframe'),
         
         # Redis configuration
@@ -178,6 +176,7 @@ def register_blueprints(app: Flask) -> None:
     # Register API blueprints
     app.register_blueprint(health_bp, url_prefix='/api/v1')
     app.register_blueprint(pdf_bp, url_prefix='/api/v1')
+    app.register_blueprint(job_bp, url_prefix='/api/v1')
 
 
 def register_error_handlers(app: Flask) -> None:

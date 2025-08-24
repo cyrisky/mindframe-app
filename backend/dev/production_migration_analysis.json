@@ -1,0 +1,199 @@
+{
+  "mongodb_issues": [
+    {
+      "file": "src/services/database_service.py",
+      "issue": "MongoDB localhost connection found",
+      "recommendation": "Replace with MongoDB Atlas connection string",
+      "example": "mongodb+srv://username:password@cluster.mongodb.net/mindframe"
+    },
+    {
+      "file": "src/services/product_report_service.py",
+      "issue": "MongoDB localhost connection found",
+      "recommendation": "Replace with MongoDB Atlas connection string",
+      "example": "mongodb+srv://username:password@cluster.mongodb.net/mindframe"
+    },
+    {
+      "file": "app.py",
+      "issue": "MongoDB localhost connection found",
+      "recommendation": "Replace with MongoDB Atlas connection string",
+      "example": "mongodb+srv://username:password@cluster.mongodb.net/mindframe"
+    },
+    {
+      "file": ".env.example",
+      "issue": "MongoDB localhost connection found",
+      "recommendation": "Replace with MongoDB Atlas connection string",
+      "example": "mongodb+srv://username:password@cluster.mongodb.net/mindframe"
+    }
+  ],
+  "redis_issues": [
+    {
+      "file": "src/services/redis_service.py",
+      "issue": "Redis localhost connection found",
+      "recommendation": "Replace with cloud Redis service",
+      "example": "redis://username:password@redis-host:6379/0"
+    },
+    {
+      "file": "job_queue/config.py",
+      "issue": "Redis localhost connection found",
+      "recommendation": "Replace with cloud Redis service",
+      "example": "redis://username:password@redis-host:6379/0"
+    },
+    {
+      "file": "app.py",
+      "issue": "Redis localhost connection found",
+      "recommendation": "Replace with cloud Redis service",
+      "example": "redis://username:password@redis-host:6379/0"
+    },
+    {
+      "file": ".env",
+      "issue": "Redis localhost connection found",
+      "recommendation": "Replace with cloud Redis service",
+      "example": "redis://username:password@redis-host:6379/0"
+    },
+    {
+      "file": ".env.example",
+      "issue": "Redis localhost connection found",
+      "recommendation": "Replace with cloud Redis service",
+      "example": "redis://username:password@redis-host:6379/0"
+    }
+  ],
+  "storage_issues": [
+    {
+      "file": "src/services/storage_service.py",
+      "issue": "Local storage path found",
+      "recommendation": "Replace with cloud storage (AWS S3, Google Cloud Storage)",
+      "example": "Use environment variables for bucket configuration"
+    },
+    {
+      "file": "app.py",
+      "issue": "Local storage path found",
+      "recommendation": "Replace with cloud storage (AWS S3, Google Cloud Storage)",
+      "example": "Use environment variables for bucket configuration"
+    },
+    {
+      "file": ".env",
+      "issue": "Local storage path found",
+      "recommendation": "Replace with cloud storage (AWS S3, Google Cloud Storage)",
+      "example": "Use environment variables for bucket configuration"
+    },
+    {
+      "file": ".env.example",
+      "issue": "Local storage path found",
+      "recommendation": "Replace with cloud storage (AWS S3, Google Cloud Storage)",
+      "example": "Use environment variables for bucket configuration"
+    }
+  ],
+  "hardcoded_paths": [
+    {
+      "file": "tests/test_personal_values_template.py",
+      "issue": "Hardcoded path found: /Users/crisbawana/Documents/2_Areas/Satu",
+      "recommendation": "Replace with environment variable or relative path",
+      "example": "Use os.getenv() or relative paths"
+    },
+    {
+      "file": "tests/test_template_renderer_service.py",
+      "issue": "Hardcoded path found: /Users/crisbawana/Documents/2_Areas/Satu",
+      "recommendation": "Replace with environment variable or relative path",
+      "example": "Use os.getenv() or relative paths"
+    },
+    {
+      "file": "scripts/migrate_to_production.py",
+      "issue": "Hardcoded path found: /Users/[^\\s\\",
+      "recommendation": "Replace with environment variable or relative path",
+      "example": "Use os.getenv() or relative paths"
+    },
+    {
+      "file": "src/api/personal_values_api.py",
+      "issue": "Hardcoded path found: /Users/crisbawana/Documents/2_Areas/Satu",
+      "recommendation": "Replace with environment variable or relative path",
+      "example": "Use os.getenv() or relative paths"
+    },
+    {
+      "file": "src/services/template_renderer_service.py",
+      "issue": "Hardcoded path found: /Users/crisbawana/Documents/2_Areas/Satu",
+      "recommendation": "Replace with environment variable or relative path",
+      "example": "Use os.getenv() or relative paths"
+    },
+    {
+      "file": "src/services/mongo_personal_values_service.py",
+      "issue": "Hardcoded path found: /Users/crisbawana/Documents/2_Areas/Satu",
+      "recommendation": "Replace with environment variable or relative path",
+      "example": "Use os.getenv() or relative paths"
+    }
+  ],
+  "smtp_issues": [
+    {
+      "file": "app.py",
+      "issue": "SMTP localhost configuration found",
+      "recommendation": "Replace with production email service",
+      "example": "SendGrid: smtp.sendgrid.net, AWS SES: email-smtp.region.amazonaws.com"
+    },
+    {
+      "file": ".env",
+      "issue": "SMTP localhost configuration found",
+      "recommendation": "Replace with production email service",
+      "example": "SendGrid: smtp.sendgrid.net, AWS SES: email-smtp.region.amazonaws.com"
+    },
+    {
+      "file": ".env.example",
+      "issue": "SMTP localhost configuration found",
+      "recommendation": "Replace with production email service",
+      "example": "SendGrid: smtp.sendgrid.net, AWS SES: email-smtp.region.amazonaws.com"
+    }
+  ],
+  "cors_issues": [
+    {
+      "file": "app.py",
+      "issue": "CORS localhost configuration found",
+      "recommendation": "Replace with production domain URLs",
+      "example": "https://yourdomain.com,https://www.yourdomain.com"
+    },
+    {
+      "file": "src/api/app.py",
+      "issue": "CORS localhost configuration found",
+      "recommendation": "Replace with production domain URLs",
+      "example": "https://yourdomain.com,https://www.yourdomain.com"
+    },
+    {
+      "file": ".env",
+      "issue": "CORS localhost configuration found",
+      "recommendation": "Replace with production domain URLs",
+      "example": "https://yourdomain.com,https://www.yourdomain.com"
+    },
+    {
+      "file": ".env.example",
+      "issue": "CORS localhost configuration found",
+      "recommendation": "Replace with production domain URLs",
+      "example": "https://yourdomain.com,https://www.yourdomain.com"
+    }
+  ],
+  "google_credentials": [
+    {
+      "file": ".env",
+      "issue": "Local Google credentials file path found",
+      "recommendation": "Use environment variable with JSON content or cloud secret manager",
+      "example": "GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_JSON='{\"type\": \"service_account\", ...}'"
+    },
+    {
+      "file": ".env.example",
+      "issue": "Local Google credentials file path found",
+      "recommendation": "Use environment variable with JSON content or cloud secret manager",
+      "example": "GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_JSON='{\"type\": \"service_account\", ...}'"
+    }
+  ],
+  "summary": {
+    "total_files_checked": 6887,
+    "critical_issues": [
+      "MongoDB localhost",
+      "Redis localhost",
+      "Hardcoded paths"
+    ],
+    "recommended_services": {
+      "database": "MongoDB Atlas",
+      "cache": "Redis Cloud / AWS ElastiCache",
+      "storage": "AWS S3 / Google Cloud Storage",
+      "email": "SendGrid / AWS SES",
+      "monitoring": "Sentry / New Relic"
+    }
+  }
+}

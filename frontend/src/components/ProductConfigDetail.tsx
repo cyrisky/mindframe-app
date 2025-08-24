@@ -104,15 +104,15 @@ export const ProductConfigDetail: React.FC<ProductConfigDetailProps> = ({
         <CardHeader>
           <CardTitle>Test Combinations</CardTitle>
           <CardDescription>
-            {config.testCombinations.length} test{config.testCombinations.length !== 1 ? 's' : ''} configured
+            {(config.testCombinations || config.tests || []).length} test{(config.testCombinations || config.tests || []).length !== 1 ? 's' : ''} configured
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {config.testCombinations.length === 0 ? (
+          {(config.testCombinations || config.tests || []).length === 0 ? (
             <p className="text-gray-500 text-center py-4">No test combinations configured</p>
           ) : (
             <div className="space-y-3">
-              {config.testCombinations
+              {(config.testCombinations || config.tests || [])
                 .sort((a, b) => a.order - b.order)
                 .map((test, index) => (
                   <div key={index} className="border rounded-lg p-4">
@@ -152,13 +152,13 @@ export const ProductConfigDetail: React.FC<ProductConfigDetailProps> = ({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Cover Page Title</label>
               <p className="text-sm bg-gray-50 p-2 rounded min-h-[2.5rem]">
-                {config.staticContent.coverPageTitle || 'Not set'}
+                {config.staticContent?.coverPageTitle || 'Not set'}
               </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Cover Page Subtitle</label>
               <p className="text-sm bg-gray-50 p-2 rounded min-h-[2.5rem]">
-                {config.staticContent.coverPageSubtitle || 'Not set'}
+                {config.staticContent?.coverPageSubtitle || 'Not set'}
               </p>
             </div>
           </div>
@@ -166,14 +166,14 @@ export const ProductConfigDetail: React.FC<ProductConfigDetailProps> = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Introduction</label>
             <div className="text-sm bg-gray-50 p-3 rounded min-h-[4rem] whitespace-pre-wrap">
-              {config.staticContent.introduction || 'No introduction content set'}
+              {config.staticContent?.introduction || 'No introduction content set'}
             </div>
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Conclusion</label>
             <div className="text-sm bg-gray-50 p-3 rounded min-h-[4rem] whitespace-pre-wrap">
-              {config.staticContent.conclusion || 'No conclusion content set'}
+              {config.staticContent?.conclusion || 'No conclusion content set'}
             </div>
           </div>
         </CardContent>
